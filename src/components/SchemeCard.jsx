@@ -1,0 +1,93 @@
+import React from 'react';
+import { CATEGORIES, CAT_COLORS, STATUS_COLORS } from '../constants/tracker';
+
+const SchemeCard = ({ scheme, showCategoryBadge }) => {
+    const isVerified = scheme.linkStatus === 'verified';
+    const isProbable = scheme.linkStatus === 'probable';
+    const isArchived = scheme.status === 'Closed' || scheme.status === 'Verify Manually';
+
+    let buttonLabel = 'Apply Now';
+    if (scheme.status === 'Coming Soon') buttonLabel = 'View Details';
+    if (isArchived) buttonLabel = 'Archived / Closed';
+
+    const catColor = CAT_COLORS[scheme.category] || CAT_COLORS.national;
+    const catMeta = CATEGORIES.find(c => c.key === scheme.category);
+    const statusColor = STATUS_COLORS[scheme.status] || 'bg-slate-800 text-slate-400 border-slate-700';
+
+    return (
+        <div className={`relative flex flex-col gap-4 p-6 rounded-2xl border bg-slate-800/80 transition-all duration-300 hover:shadow-xl hover:-translate-y-1 ${isArchived ? 'opacity-70 grayscale' : 'border-slate-700 hover:border-slate-500'}`}>
+            {/* Status Badge */}
+            <span className={`absolute top-4 right-4 px-3 py-1 text-xs font-semibold uppercase tracking-wider rounded-full border ${statusColor}`}>
+                {scheme.status}
+            </span>
+
+            {/* Category Badge */}
+            {showCategoryBadge && scheme.category && scheme.category !== 'all' && (
+                <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 text-xs font-semibold rounded-full border w-fit mt-2 ${catColor.bg} ${catColor.border} ${catColor.text}`}>
+                    {catMeta?.icon} {catMeta?.label ?? scheme.category}
+                </span>
+            )}
+
+            {/* Title & Provider */}
+            <div>
+                <h3 className="text-xl font-semibold text-slate-100 pr-24 leading-tight mb-1">{scheme.name}</h3>
+                <p className="text-sm font-medium text-blue-400">{scheme.body}</p>
+            </div>
+
+            {/* Tags (Sectors / Stages) */}
+            {(scheme.sectors || scheme.stages) && (
+                <div className="flex flex-wrap gap-2 mt-1">
+                    {scheme.stages?.map(s => (
+                        <span key={s} className="px-2 py-0.5 text-[0.7rem] font-medium tracking-wide uppercase rounded text-slate-400 bg-white/5 border border-white/10">{s}</span>
+                    ))}
+                    {scheme.sectors?.map(s => (
+                        <span key={s} className="px-2 py-0.5 text-[0.7rem] font-medium tracking-wide uppercase rounded text-blue-400 bg-blue-900/20 border border-blue-500/30">{s}</span>
+                    ))}
+                </div>
+            )}
+
+            {/* Description */}
+            <p className="text-sm text-slate-400 leading-relaxed mt-2">{scheme.description}</p>
+
+            {/* Footer Elements */}
+            <div className="flex justify-between items-end mt-auto pt-4">
+                <span className="font-bold text-lg text-slate-200">{scheme.maxAward}</span>
+
+                <div className="flex flex-col items-end gap-2 text-right">
+                    {/* Link Badges */}
+                    {isVerified && !isArchived && (
+                        <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full border bg-emerald-900/20 border-emerald-500/40 text-emerald-400">
+                            ✅ Verified Link
+                        </span>
+                    )}
+                    {isProbable && !isArchived && (
+                        <span className="inline-block px-2 py-0.5 text-xs font-medium rounded-full border bg-amber-900/20 border-amber-500/40 text-amber-400">
+                            ⚠️ Probable Link
+                        </span>
+                    )}
+
+                    {/* Apply Button */}
+                    <a
+                        href={scheme.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`inline-block px-5 py-2 rounded-lg font-semibold text-sm transition-colors border ${isArchived
+                            ? 'bg-transparent border-slate-600 text-slate-500 cursor-not-allowed pointer-events-none'
+                            : 'bg-transparent border-blue-500 text-blue-400 hover:bg-blue-500/10'
+                            }`}
+                        aria-disabled={isArchived}
+                    >
+                        {buttonLabel}
+                    </a>
+                </div>
+            </div>
+
+            {/* Deadline */}
+            <div className="text-xs text-slate-500 mt-1 border-t border-slate-700/50 pt-3">
+                📅 Deadline: <strong className="text-slate-300 font-semibold">{scheme.deadline}</strong>
+            </div>
+        </div>
+    );
+};
+
+export default SchemeCard;
