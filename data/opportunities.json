@@ -9,7 +9,7 @@
     "status": "Open",
     "linkStatus": "verified",
     "category": "csr",
-    "lastScraped": "2026-03-06T19:29:25.299Z",
+    "lastScraped": "2026-03-06T20:11:52.421Z",
     "targetAudience": [
       "incubator",
       "startup"
@@ -31,7 +31,7 @@
     "status": "Open",
     "linkStatus": "verified",
     "category": "international",
-    "lastScraped": "2026-03-06T19:29:20.461Z",
+    "lastScraped": "2026-03-06T20:11:47.556Z",
     "targetAudience": [
       "startup"
     ],
@@ -52,7 +52,7 @@
     "status": "Rolling",
     "linkStatus": "verified",
     "category": "national",
-    "lastScraped": "2026-03-06T19:29:21.652Z",
+    "lastScraped": "2026-03-06T20:11:48.807Z",
     "targetAudience": [
       "incubator"
     ],
@@ -73,7 +73,7 @@
     "status": "Verify Manually",
     "linkStatus": "broken",
     "category": "national",
-    "lastScraped": "2026-03-06T19:29:21.294Z",
+    "lastScraped": "2026-03-06T20:11:48.253Z",
     "targetAudience": [
       "startup"
     ],
@@ -94,7 +94,7 @@
     "status": "Rolling",
     "linkStatus": "verified",
     "category": "national",
-    "lastScraped": "2026-03-06T19:29:25.279Z",
+    "lastScraped": "2026-03-06T20:11:52.398Z",
     "targetAudience": [
       "startup"
     ],
@@ -115,7 +115,7 @@
     "status": "Rolling",
     "linkStatus": "verified",
     "category": "national",
-    "lastScraped": "2026-03-06T19:29:29.183Z",
+    "lastScraped": "2026-03-06T20:11:55.986Z",
     "targetAudience": [
       "startup"
     ],
@@ -136,7 +136,7 @@
     "status": "Rolling",
     "linkStatus": "verified",
     "category": "national",
-    "lastScraped": "2026-03-06T19:29:28.065Z",
+    "lastScraped": "2026-03-06T20:11:57.015Z",
     "targetAudience": [
       "startup"
     ],
@@ -157,7 +157,7 @@
     "status": "Rolling",
     "linkStatus": "verified",
     "category": "national",
-    "lastScraped": "2026-03-06T19:29:28.776Z",
+    "lastScraped": "2026-03-06T20:11:55.960Z",
     "targetAudience": [
       "startup"
     ],
@@ -178,7 +178,7 @@
     "status": "Verify Manually",
     "linkStatus": "broken",
     "category": "national",
-    "lastScraped": "2026-03-06T19:29:30.779Z",
+    "lastScraped": "2026-03-06T20:11:58.210Z",
     "targetAudience": [
       "incubator"
     ],
@@ -199,7 +199,7 @@
     "status": "Verify Manually",
     "linkStatus": "broken",
     "category": "national",
-    "lastScraped": "2026-03-06T19:29:27.388Z",
+    "lastScraped": "2026-03-06T20:11:53.560Z",
     "targetAudience": [
       "incubator"
     ],
@@ -220,7 +220,7 @@
     "status": "Rolling",
     "linkStatus": "verified",
     "category": "national",
-    "lastScraped": "2026-03-06T19:29:32.006Z",
+    "lastScraped": "2026-03-06T20:11:59.640Z",
     "targetAudience": [
       "incubator"
     ],
@@ -241,7 +241,7 @@
     "status": "Rolling",
     "linkStatus": "verified",
     "category": "national",
-    "lastScraped": "2026-03-06T19:29:34.416Z",
+    "lastScraped": "2026-03-06T20:12:01.311Z",
     "targetAudience": [
       "incubator"
     ],
@@ -262,7 +262,7 @@
     "status": "Verify Manually",
     "linkStatus": "broken",
     "category": "national",
-    "lastScraped": "2026-03-06T19:29:35.159Z",
+    "lastScraped": "2026-03-06T20:12:04.169Z",
     "targetAudience": [
       "incubator"
     ],
@@ -283,7 +283,7 @@
     "status": "Rolling",
     "linkStatus": "verified",
     "category": "international",
-    "lastScraped": "2026-03-06T19:29:31.444Z",
+    "lastScraped": "2026-03-06T20:11:59.269Z",
     "targetAudience": [
       "startup"
     ],
@@ -304,7 +304,7 @@
     "status": "Verify Manually",
     "linkStatus": "broken",
     "category": "international",
-    "lastScraped": "2026-03-06T19:29:32.109Z",
+    "lastScraped": "2026-03-06T20:11:59.532Z",
     "targetAudience": [
       "startup"
     ],
@@ -325,7 +325,7 @@
     "status": "Rolling",
     "linkStatus": "verified",
     "category": "csr",
-    "lastScraped": "2026-03-06T19:29:36.482Z",
+    "lastScraped": "2026-03-06T20:12:05.182Z",
     "targetAudience": [
       "incubator"
     ],
@@ -346,7 +346,7 @@
     "status": "Verify Manually",
     "linkStatus": "broken",
     "category": "international",
-    "lastScraped": "2026-03-06T19:29:37.450Z",
+    "lastScraped": "2026-03-06T20:12:05.498Z",
     "targetAudience": [
       "startup"
     ],
@@ -367,7 +367,7 @@
     "status": "Open",
     "linkStatus": "verified",
     "category": "international",
-    "lastScraped": "2026-03-06T19:29:37.222Z",
+    "lastScraped": "2026-03-06T20:12:05.942Z",
     "targetAudience": [
       "startup"
     ],
@@ -388,7 +388,7 @@
     "status": "Verify Manually",
     "linkStatus": "broken",
     "category": "international",
-    "lastScraped": "2026-03-06T19:29:37.093Z",
+    "lastScraped": "2026-03-06T20:12:05.880Z",
     "targetAudience": [
       "incubator"
     ],
@@ -409,7 +409,7 @@
     "status": "Verify Manually",
     "linkStatus": "broken",
     "category": "international",
-    "lastScraped": "2026-03-06T19:29:36.008Z",
+    "lastScraped": "2026-03-06T20:12:04.751Z",
     "targetAudience": [
       "startup"
     ],
@@ -430,7 +430,7 @@
     "status": "Verify Manually",
     "linkStatus": "broken",
     "category": "csr",
-    "lastScraped": "2026-03-06T19:29:43.662Z",
+    "lastScraped": "2026-03-06T20:12:12.512Z",
     "targetAudience": [
       "incubator"
     ],
@@ -451,7 +451,7 @@
     "status": "Rolling",
     "linkStatus": "verified",
     "category": "csr",
-    "lastScraped": "2026-03-06T19:29:39.219Z",
+    "lastScraped": "2026-03-06T20:12:07.897Z",
     "targetAudience": [
       "incubator",
       "startup"
@@ -473,7 +473,7 @@
     "status": "Rolling",
     "linkStatus": "verified",
     "category": "csr",
-    "lastScraped": "2026-03-06T19:29:40.257Z",
+    "lastScraped": "2026-03-06T20:12:09.791Z",
     "targetAudience": [
       "incubator",
       "startup"
@@ -495,7 +495,7 @@
     "status": "Verify Manually",
     "linkStatus": "broken",
     "category": "international",
-    "lastScraped": "2026-03-06T19:29:41.855Z",
+    "lastScraped": "2026-03-06T20:12:10.408Z",
     "targetAudience": [
       "startup"
     ],
@@ -516,7 +516,7 @@
     "status": "Rolling",
     "linkStatus": "verified",
     "category": "international",
-    "lastScraped": "2026-03-06T19:29:38.002Z",
+    "lastScraped": "2026-03-06T20:12:06.518Z",
     "targetAudience": [
       "startup"
     ],
@@ -537,7 +537,7 @@
     "status": "Open",
     "linkStatus": "verified",
     "category": "international",
-    "lastScraped": "2026-03-06T19:29:44.682Z",
+    "lastScraped": "2026-03-06T20:12:13.227Z",
     "targetAudience": [
       "startup"
     ],
@@ -558,7 +558,7 @@
     "status": "Rolling",
     "linkStatus": "probable",
     "category": "csr",
-    "lastScraped": "2026-03-06T19:29:16.678Z",
+    "lastScraped": "2026-03-06T20:11:43.639Z",
     "dataSource": "scraper:sbif",
     "targetAudience": [
       "incubator",
@@ -586,7 +586,7 @@
     "linkStatus": "verified",
     "provider": "DPIIT",
     "amount": "Up to ₹50 Lakhs",
-    "lastScraped": "2026-03-06T19:29:12.965Z",
+    "lastScraped": "2026-03-06T20:11:39.758Z",
     "dataSource": "scraper:sisfs:incubator",
     "targetAudience": [
       "incubator"
@@ -607,7 +607,7 @@
     "category": "national",
     "status": "Rolling",
     "linkStatus": "probable",
-    "lastScraped": "2026-03-06T19:29:04.188Z",
+    "lastScraped": "2026-03-06T20:11:30.286Z",
     "description": "BIRAC Call for Proposal. Visit the link to see full details and eligibility.",
     "dataSource": "scraper:birac",
     "targetAudience": [
@@ -633,7 +633,7 @@
     "category": "national",
     "status": "Open",
     "linkStatus": "probable",
-    "lastScraped": "2026-03-06T19:29:04.268Z",
+    "lastScraped": "2026-03-06T20:11:30.136Z",
     "description": "BIRAC Call for Proposal. Visit the link to see full details and eligibility.",
     "dataSource": "scraper:birac",
     "targetAudience": [
@@ -709,7 +709,7 @@
     "category": "national",
     "status": "Rolling",
     "linkStatus": "verified",
-    "lastScraped": "2026-03-06T19:29:07.944Z",
+    "lastScraped": "2026-03-06T20:11:33.695Z",
     "dataSource": "scraper:dst",
     "targetAudience": [
       "startup"
@@ -735,7 +735,7 @@
     "category": "national",
     "status": "Open",
     "linkStatus": "verified",
-    "lastScraped": "2026-03-06T19:29:07.399Z",
+    "lastScraped": "2026-03-06T20:11:35.166Z",
     "dataSource": "scraper:dst",
     "targetAudience": [
       "startup"
@@ -761,7 +761,7 @@
     "category": "international",
     "status": "Open",
     "linkStatus": "verified",
-    "lastScraped": "2026-03-06T19:29:08.885Z",
+    "lastScraped": "2026-03-06T20:11:34.184Z",
     "dataSource": "scraper:dst",
     "targetAudience": [
       "startup"
@@ -787,7 +787,7 @@
     "category": "international",
     "status": "Open",
     "linkStatus": "verified",
-    "lastScraped": "2026-03-06T19:29:08.394Z",
+    "lastScraped": "2026-03-06T20:11:34.165Z",
     "dataSource": "scraper:dst",
     "targetAudience": [
       "startup"
@@ -813,7 +813,7 @@
     "category": "international",
     "status": "Rolling",
     "linkStatus": "verified",
-    "lastScraped": "2026-03-06T19:29:08.444Z",
+    "lastScraped": "2026-03-06T20:11:34.660Z",
     "dataSource": "scraper:dst",
     "targetAudience": [
       "startup"
@@ -840,7 +840,7 @@
     "status": "Verify Manually",
     "dataSource": "manual:incubator",
     "linkStatus": "broken",
-    "lastScraped": "2026-03-06T19:29:49.303Z",
+    "lastScraped": "2026-03-06T20:12:18.789Z",
     "targetAudience": [
       "incubator"
     ],
@@ -862,7 +862,7 @@
     "status": "Verify Manually",
     "dataSource": "manual:incubator",
     "linkStatus": "broken",
-    "lastScraped": "2026-03-06T19:29:47.378Z",
+    "lastScraped": "2026-03-06T20:12:16.548Z",
     "targetAudience": [
       "incubator"
     ],
@@ -884,7 +884,7 @@
     "status": "Rolling",
     "dataSource": "manual:csr",
     "linkStatus": "verified",
-    "lastScraped": "2026-03-06T19:29:48.094Z",
+    "lastScraped": "2026-03-06T20:13:28.926Z",
     "targetAudience": [
       "incubator",
       "startup"
@@ -895,5 +895,101 @@
     "stages": [
       "All Stages"
     ]
+  },
+  {
+    "name": "NABARD AgriSURE Fund (Direct Scheme)",
+    "body": "NABVENTURES / MoA&FW",
+    "maxAward": "Up to ?25 Crores",
+    "deadline": "Rolling",
+    "link": "https://nabventures.in/agrisure/",
+    "description": "Direct equity investments in early-stage AgriTech and allied sector startups with high-impact potential.",
+    "category": "national",
+    "status": "Verify Manually",
+    "dataSource": "manual:agritech",
+    "targetAudience": [
+      "startup"
+    ],
+    "sectors": [
+      "AgriTech",
+      "DeepTech"
+    ],
+    "stages": [
+      "Seed",
+      "Early Traction",
+      "Scale-up"
+    ],
+    "linkStatus": "broken",
+    "lastScraped": "2026-03-06T20:12:13.463Z"
+  },
+  {
+    "name": "RKVY-RAFTAAR Seed Grants (NEST/NEO)",
+    "body": "Various Incubators (NaaViC, etc.)",
+    "maxAward": "Up to ?25 Lakhs",
+    "deadline": "Varies by Incubator",
+    "link": "https://rkvy.nic.in/",
+    "description": "Pre-seed and seed stage grants disbursed through partner Agribusiness Incubators (R-ABIs) across India.",
+    "category": "national",
+    "status": "Rolling",
+    "dataSource": "manual:agritech",
+    "targetAudience": [
+      "startup"
+    ],
+    "sectors": [
+      "AgriTech"
+    ],
+    "stages": [
+      "Ideation",
+      "Seed"
+    ],
+    "linkStatus": "probable",
+    "lastScraped": "2026-03-06T20:13:35.071Z"
+  },
+  {
+    "name": "MANAGE-CIA Agri-Business Incubation",
+    "body": "MANAGE Hyderabad",
+    "maxAward": "Up to ?25 Lakhs",
+    "deadline": "March 2026",
+    "link": "https://www.manage.gov.in/cia/",
+    "description": "Comprehensive incubation program offering mentorship, infrastructure, and financial grants for agri-startups.",
+    "category": "national",
+    "status": "Verify Manually",
+    "dataSource": "manual:agritech",
+    "targetAudience": [
+      "incubator",
+      "startup"
+    ],
+    "sectors": [
+      "AgriTech"
+    ],
+    "stages": [
+      "Ideation",
+      "Seed"
+    ],
+    "linkStatus": "broken",
+    "lastScraped": "2026-03-06T20:13:30.769Z"
+  },
+  {
+    "name": "AGRI UDAAN 8.0 Food & Agribusiness Accelerator",
+    "body": "ICAR-NAARM a-IDEA",
+    "maxAward": "Accelerator Support",
+    "deadline": "Coming Soon",
+    "link": "https://aidea.naarm.org.in/",
+    "description": "Premier acceleration program targeting scaling startups with validated market solutions in agriculture and food tech.",
+    "category": "national",
+    "status": "Coming Soon",
+    "dataSource": "manual:agritech",
+    "targetAudience": [
+      "startup"
+    ],
+    "sectors": [
+      "AgriTech",
+      "FoodTech"
+    ],
+    "stages": [
+      "Early Traction",
+      "Scale-up"
+    ],
+    "linkStatus": "verified",
+    "lastScraped": "2026-03-06T20:13:33.988Z"
   }
 ]
