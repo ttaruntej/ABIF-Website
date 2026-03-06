@@ -111,7 +111,9 @@ const Dashboard = () => {
     );
     const sectionRefs = useRef({});
 
+    // Fetch from the static JSON file
     const fetchData = () => {
+        // v=${Date.now()} ensures we break the browser cache to get the absolute latest from GitHub
         fetch(`./data/opportunities.json?v=${Date.now()}`)
             .then(res => {
                 if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
@@ -142,6 +144,7 @@ const Dashboard = () => {
 
     useEffect(() => {
         let timer;
+        // Simulating the network fetch delay to show the UI
         if (isRefreshing && countdown > 0) {
             timer = setTimeout(() => setCountdown(c => c - 1), 1000);
         } else if (isRefreshing && countdown === 0) {
@@ -150,7 +153,10 @@ const Dashboard = () => {
         return () => clearTimeout(timer);
     }, [isRefreshing, countdown]);
 
-    const handleRefresh = () => { setIsRefreshing(true); setCountdown(8); };
+    const handleRefresh = () => {
+        setIsRefreshing(true);
+        setCountdown(3); // Reduced from 8s to 3s since it's just fetching the latest JSON now
+    };
 
     const scrollToSection = (key) => {
         const el = sectionRefs.current[key];
@@ -203,9 +209,9 @@ const Dashboard = () => {
                     <div className="refresh-modal">
                         <div className="spinner"></div>
                         <h2>Updating Dashboard</h2>
-                        <p>Syncing with latest funding databases...</p>
+                        <p>Fetching latest data from the nightly automated scraper...</p>
                         <div className="countdown-container">
-                            <div className="countdown-bar" style={{ width: `${(8 - countdown) / 8 * 100}%` }}></div>
+                            <div className="countdown-bar" style={{ width: `${(3 - countdown) / 3 * 100}%`, transition: 'width 1s linear' }}></div>
                         </div>
                         <span className="timer-text">{countdown}s</span>
                     </div>
