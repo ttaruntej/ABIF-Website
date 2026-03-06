@@ -54,12 +54,17 @@ const CAT_COLORS = {
 const SchemeCard = ({ scheme, showCategoryBadge }) => {
     const isVerified = scheme.linkStatus === 'verified';
     const isProbable = scheme.linkStatus === 'probable';
-    const buttonLabel = scheme.status === 'Coming Soon' ? 'View Details' : 'Apply Now';
+    let buttonLabel = 'Apply Now';
+    if (scheme.status === 'Coming Soon') buttonLabel = 'View Details';
+    if (scheme.status === 'Closed' || scheme.status === 'Verify Manually') buttonLabel = 'Archived / Closed';
+
     const catColor = CAT_COLORS[scheme.category] || CAT_COLORS.national;
     const catMeta = CATEGORIES.find(c => c.key === scheme.category);
 
+    const isArchived = scheme.status === 'Closed' || scheme.status === 'Verify Manually';
+
     return (
-        <div className="scheme-card">
+        <div className={`scheme-card ${isArchived ? 'archived-card' : ''}`}>
             <span className={`status-badge status-${scheme.status.toLowerCase().replace(/\s+/g, '-')}`}>
                 {scheme.status}
             </span>
@@ -82,9 +87,15 @@ const SchemeCard = ({ scheme, showCategoryBadge }) => {
             <div className="scheme-footer">
                 <span className="award-amount">{scheme.maxAward}</span>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
-                    {isVerified && <span className="badge-verified">✅ Verified Link</span>}
-                    {isProbable && <span className="badge-probable">⚠️ Probable Link</span>}
-                    <a href={scheme.link} target="_blank" rel="noopener noreferrer" className="btn-apply">
+                    {isVerified && !isArchived && <span className="badge-verified">✅ Verified Link</span>}
+                    {isProbable && !isArchived && <span className="badge-probable">⚠️ Probable Link</span>}
+                    <a
+                        href={scheme.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="btn-apply"
+                        style={isArchived ? { opacity: 0.6, cursor: 'not-allowed', filter: 'grayscale(1)' } : {}}
+                    >
                         {buttonLabel}
                     </a>
                 </div>
@@ -107,6 +118,7 @@ const Dashboard = () => {
     const [refreshSuccess, setRefreshSuccess] = useState(false);
     const [countdown, setCountdown] = useState(0);
     const [activeCategory, setActiveCategory] = useState('all');
+    const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' | 'archive'
     const [lastUpdated, setLastUpdated] = useState(
         `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
     );
@@ -288,6 +300,13 @@ const Dashboard = () => {
                     <p style={{ color: 'var(--text-dim)', fontSize: '0.9rem' }}>Opportunities Tracker</p>
                 </div>
                 <div className="header-actions">
+                    <button
+                        className="btn-refresh"
+                        onClick={() => setCurrentView(currentView === 'dashboard' ? 'archive' : 'dashboard')}
+                        style={{ marginRight: '0.5rem', background: currentView === 'dashboard' ? 'rgba(255,107,107,0.1)' : 'rgba(100,255,218,0.1)', color: currentView === 'dashboard' ? '#ff6b6b' : '#64ffda', borderColor: currentView === 'dashboard' ? '#ff6b6b' : '#64ffda' }}
+                    >
+                        {currentView === 'dashboard' ? '🗄️ View Archive' : '📊 Back to Dashboard'}
+                    </button>
                     <button className="btn-refresh" onClick={handleRefresh} disabled={isRefreshing}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M23 4v6h-6"></path>
@@ -302,106 +321,141 @@ const Dashboard = () => {
                 </div>
             </header>
 
-            {/* ── Stats row ─────────────────────────────────────── */}
-            <section className="stats-grid">
-                <div className="stat-card">
-                    <p className="scheme-body">Active Opportunities</p>
-                    <h2 className="stat-value">{stats.active}</h2>
-                </div>
-                <div className="stat-card" style={{ gridColumn: 'span 2', textAlign: 'left', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                    <p className="scheme-body" style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>AI Research Briefing</p>
-                    <p className="scheme-body" style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
-                        {stats.briefing}
-                    </p>
-                </div>
-                <div className="stat-card">
-                    <p className="scheme-body">Total Tracked</p>
-                    <h2 className="stat-value">{stats.total}</h2>
-                </div>
-                <div className="stat-card">
-                    <p className="scheme-body">Closing Soon</p>
-                    <h2 className="stat-value" style={{ color: '#ff6b6b' }}>{stats.closingSoon}</h2>
-                </div>
-            </section>
-
-            {/* ── Category Nav Bar ──────────────────────────────── */}
-            <nav className="category-nav">
-                <div className="category-nav-inner">
-                    {CATEGORIES.map(cat => (
-                        <button
-                            key={cat.key}
-                            className={`category-tab cat-${cat.key}${activeCategory === cat.key ? ' active' : ''}`}
-                            onClick={() => setActiveCategory(cat.key)}
-                        >
-                            <span className="cat-icon">{cat.icon}</span>
-                            <span className="cat-label">{cat.label}</span>
-                            <span className="cat-count">{catCounts[cat.key]}</span>
-                        </button>
-                    ))}
-                </div>
-
-                {/* Quick-jump anchors for visible sections */}
-                {visibleSections.length > 0 && (
-                    <div className="section-jumps">
-                        <span className="jump-label">Jump to:</span>
-                        {visibleSections.map(s => (
-                            <button
-                                key={s.key}
-                                className="jump-btn"
-                                onClick={() => scrollToSection(s.key)}
-                            >
-                                {s.label.split(' ').slice(0, 2).join(' ')}
-                                <span className="jump-count">{s.items.length}</span>
-                            </button>
-                        ))}
-                    </div>
-                )}
-            </nav>
-
-            {/* ── Link verification legend ─────────────────────── */}
-            {(verifiedCount > 0 || probableCount > 0) && (
-                <div className="link-legend">
-                    <span><span className="badge-verified">✅ Verified Link</span> — confirmed URL is reachable ({verifiedCount})</span>
-                    <span><span className="badge-probable">⚠️ Probable Link</span> — may redirect to portal homepage ({probableCount})</span>
-                </div>
-            )}
-
-            {/* ── Empty state ───────────────────────────────────── */}
-            {filtered.length === 0 && (
-                <div className="empty-state">
-                    <div className="empty-icon">🔍</div>
-                    <h3>No Opportunities Found</h3>
-                    <p>No {CATEGORIES.find(c => c.key === activeCategory)?.label} opportunities are tracked yet. Check back soon!</p>
-                    <button className="btn-apply" onClick={() => setActiveCategory('all')} style={{ marginTop: '1rem' }}>
-                        View All Opportunities
-                    </button>
-                </div>
-            )}
-
-            {/* ── Sectioned scheme cards ───────────────────────── */}
-            {visibleSections.map(section => (
-                <div
-                    key={section.key}
-                    id={section.key}
-                    ref={el => { sectionRefs.current[section.key] = el; }}
-                    className="section-block"
-                >
-                    <div className="section-header" style={{ borderLeftColor: section.borderColor }}>
-                        <h2 className="section-title">{section.label}</h2>
-                        <span className="section-subtitle">{section.subtitle}</span>
-                        <span className="section-count">{section.items.length}</span>
-                    </div>
-                    <section className="schemes-grid">
-                        {section.items.map((scheme, i) => (
-                            <SchemeCard
-                                key={`${section.key}-${i}`}
-                                scheme={scheme}
-                                showCategoryBadge={showCategoryBadge}
-                            />
-                        ))}
+            {/* ── Main Dashboard View ────────────────────────────── */}
+            {currentView === 'dashboard' ? (
+                <>
+                    {/* ── Stats row ─────────────────────────────────────── */}
+                    <section className="stats-grid">
+                        <div className="stat-card">
+                            <p className="scheme-body">Active Opportunities</p>
+                            <h2 className="stat-value">{stats.active}</h2>
+                        </div>
+                        <div className="stat-card" style={{ gridColumn: 'span 2', textAlign: 'left', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                            <p className="scheme-body" style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>AI Research Briefing</p>
+                            <p className="scheme-body" style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
+                                {stats.briefing}
+                            </p>
+                        </div>
+                        <div className="stat-card">
+                            <p className="scheme-body">Total Tracked</p>
+                            <h2 className="stat-value">{stats.total}</h2>
+                        </div>
+                        <div className="stat-card">
+                            <p className="scheme-body">Closing Soon</p>
+                            <h2 className="stat-value" style={{ color: '#ff6b6b' }}>{stats.closingSoon}</h2>
+                        </div>
                     </section>
+
+                    {/* ── Category Nav Bar ──────────────────────────────── */}
+                    <nav className="category-nav">
+                        <div className="category-nav-inner">
+                            {CATEGORIES.map(cat => (
+                                <button
+                                    key={cat.key}
+                                    className={`category-tab cat-${cat.key}${activeCategory === cat.key ? ' active' : ''}`}
+                                    onClick={() => setActiveCategory(cat.key)}
+                                >
+                                    <span className="cat-icon">{cat.icon}</span>
+                                    <span className="cat-label">{cat.label}</span>
+                                    <span className="cat-count">{catCounts[cat.key]}</span>
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Quick-jump anchors for visible sections */}
+                        {visibleSections.length > 0 && (
+                            <div className="section-jumps">
+                                <span className="jump-label">Jump to:</span>
+                                {visibleSections.map(s => (
+                                    <button
+                                        key={s.key}
+                                        className="jump-btn"
+                                        onClick={() => scrollToSection(s.key)}
+                                    >
+                                        {s.label.split(' ').slice(0, 2).join(' ')}
+                                        <span className="jump-count">{s.items.length}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                    </nav>
+
+                    {/* ── Link verification legend ─────────────────────── */}
+                    {(verifiedCount > 0 || probableCount > 0) && (
+                        <div className="link-legend">
+                            <span><span className="badge-verified">✅ Verified Link</span> — confirmed URL is reachable ({verifiedCount})</span>
+                            <span><span className="badge-probable">⚠️ Probable Link</span> — may redirect to portal homepage ({probableCount})</span>
+                        </div>
+                    )}
+
+                    {/* ── Empty state ───────────────────────────────────── */}
+                    {filtered.length === 0 && (
+                        <div className="empty-state">
+                            <div className="empty-icon">🔍</div>
+                            <h3>No Opportunities Found</h3>
+                            <p>No {CATEGORIES.find(c => c.key === activeCategory)?.label} opportunities are tracked yet. Check back soon!</p>
+                            <button className="btn-apply" onClick={() => setActiveCategory('all')} style={{ marginTop: '1rem' }}>
+                                View All Opportunities
+                            </button>
+                        </div>
+                    )}
+
+                    {/* ── Sectioned scheme cards ───────────────────────── */}
+                    {visibleSections.map(section => (
+                        <div
+                            key={section.key}
+                            id={section.key}
+                            ref={el => { sectionRefs.current[section.key] = el; }}
+                            className="section-block"
+                        >
+                            <div className="section-header" style={{ borderLeftColor: section.borderColor }}>
+                                <h2 className="section-title">{section.label}</h2>
+                                <span className="section-subtitle">{section.subtitle}</span>
+                                <span className="section-count">{section.items.length}</span>
+                            </div>
+                            <section className="schemes-grid">
+                                {section.items.map((scheme, i) => (
+                                    <SchemeCard
+                                        key={`${section.key}-${i}`}
+                                        scheme={scheme}
+                                        showCategoryBadge={showCategoryBadge}
+                                    />
+                                ))}
+                            </section>
+                        </div>
+                    ))}
+                </>
+            ) : (
+                /* ── Archive Subpage View ────────────────────────────── */
+                <div className="archive-view">
+                    <div className="section-header" style={{ borderLeftColor: '#ff6b6b', marginTop: '1rem' }}>
+                        <h2 className="section-title">🗄️ Closed & Archived Opportunities</h2>
+                        <span className="section-subtitle">Past funding programs kept for reference. Applying is no longer possible.</span>
+                        <span className="section-count">{opportunities.filter(o => ['Closed', 'Verify Manually'].includes(o.status)).length}</span>
+                    </div>
+
+                    {opportunities.filter(o => ['Closed', 'Verify Manually'].includes(o.status)).length === 0 ? (
+                        <div className="empty-state">
+                            <div className="empty-icon">✨</div>
+                            <h3>No Archived Opportunities</h3>
+                            <p>All tracked funding programs are currently active or upcoming.</p>
+                        </div>
+                    ) : (
+                        <section className="schemes-grid">
+                            {opportunities
+                                .filter(o => ['Closed', 'Verify Manually'].includes(o.status))
+                                .map((scheme, i) => (
+                                    <SchemeCard
+                                        key={`archive-${i}`}
+                                        scheme={scheme}
+                                        showCategoryBadge={true}
+                                    />
+                                ))
+                            }
+                        </section>
+                    )}
                 </div>
-            ))}
+            )}
         </div>
     );
 };
