@@ -1,7 +1,16 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './index.css';
 
-// Section definitions — order determines display priority
+// ── Category definitions ──────────────────────────────────────────────────────
+const CATEGORIES = [
+    { key: 'all', label: 'All', icon: '🌐' },
+    { key: 'national', label: 'National', icon: '🇮🇳' },
+    { key: 'international', label: 'International', icon: '🌍' },
+    { key: 'state', label: 'State Specific', icon: '🏛️' },
+    { key: 'csr', label: 'CSR', icon: '🤝' },
+];
+
+// ── Status section definitions ────────────────────────────────────────────────
 const SECTIONS = [
     {
         key: 'closing-soon',
@@ -33,16 +42,37 @@ const SECTIONS = [
     },
 ];
 
-const SchemeCard = ({ scheme }) => {
+// ── Category color map ─────────────────────────────────────────────────────────
+const CAT_COLORS = {
+    national: { bg: 'rgba(66,153,225,0.12)', border: 'rgba(66,153,225,0.45)', text: '#63b3ed' },
+    international: { bg: 'rgba(159,122,234,0.12)', border: 'rgba(159,122,234,0.45)', text: '#b794f4' },
+    state: { bg: 'rgba(237,137,54,0.12)', border: 'rgba(237,137,54,0.45)', text: '#f6a65a' },
+    csr: { bg: 'rgba(56,178,172,0.12)', border: 'rgba(56,178,172,0.45)', text: '#4fd1c5' },
+};
+
+// ── SchemeCard ─────────────────────────────────────────────────────────────────
+const SchemeCard = ({ scheme, showCategoryBadge }) => {
     const isVerified = scheme.linkStatus === 'verified';
     const isProbable = scheme.linkStatus === 'probable';
     const buttonLabel = scheme.status === 'Coming Soon' ? 'View Details' : 'Apply Now';
+    const catColor = CAT_COLORS[scheme.category] || CAT_COLORS.national;
+    const catMeta = CATEGORIES.find(c => c.key === scheme.category);
 
     return (
         <div className="scheme-card">
             <span className={`status-badge status-${scheme.status.toLowerCase().replace(/\s+/g, '-')}`}>
                 {scheme.status}
             </span>
+
+            {showCategoryBadge && scheme.category && scheme.category !== 'all' && (
+                <span
+                    className="category-badge-card"
+                    style={{ background: catColor.bg, border: `1px solid ${catColor.border}`, color: catColor.text }}
+                >
+                    {catMeta?.icon} {catMeta?.label ?? scheme.category}
+                </span>
+            )}
+
             <h3 className="scheme-title">{scheme.name}</h3>
             <p className="scheme-body" style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--secondary)' }}>
                 {scheme.body}
@@ -52,13 +82,8 @@ const SchemeCard = ({ scheme }) => {
             <div className="scheme-footer">
                 <span className="award-amount">{scheme.maxAward}</span>
                 <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: '0.4rem' }}>
-                    {/* Link status badge */}
-                    {isVerified && (
-                        <span className="badge-verified">✅ Verified Link</span>
-                    )}
-                    {isProbable && (
-                        <span className="badge-probable">⚠️ Probable Link</span>
-                    )}
+                    {isVerified && <span className="badge-verified">✅ Verified Link</span>}
+                    {isProbable && <span className="badge-probable">⚠️ Probable Link</span>}
                     <a href={scheme.link} target="_blank" rel="noopener noreferrer" className="btn-apply">
                         {buttonLabel}
                     </a>
@@ -72,6 +97,7 @@ const SchemeCard = ({ scheme }) => {
     );
 };
 
+// ── Dashboard ──────────────────────────────────────────────────────────────────
 const Dashboard = () => {
     const [opportunities, setOpportunities] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -79,9 +105,11 @@ const Dashboard = () => {
     const [stats, setStats] = useState({ total: 0, active: 0, closingSoon: 0 });
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [countdown, setCountdown] = useState(0);
+    const [activeCategory, setActiveCategory] = useState('all');
     const [lastUpdated, setLastUpdated] = useState(
         `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
     );
+    const sectionRefs = useRef({});
 
     const fetchData = () => {
         fetch(`./data/opportunities.json?v=${Date.now()}`)
@@ -124,17 +152,44 @@ const Dashboard = () => {
 
     const handleRefresh = () => { setIsRefreshing(true); setCountdown(8); };
 
+    const scrollToSection = (key) => {
+        const el = sectionRefs.current[key];
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
     if (loading) return (
         <div style={{ backgroundColor: '#020c1b', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64ffda', fontFamily: 'Inter' }}>
             Loading ABIF Funding Tracker...
         </div>
     );
 
-    const verifiedCount = opportunities.filter(o => o.linkStatus === 'verified').length;
-    const probableCount = opportunities.filter(o => o.linkStatus === 'probable').length;
+    // Filtered set for current category tab
+    const filtered = activeCategory === 'all'
+        ? opportunities
+        : opportunities.filter(o => o.category === activeCategory);
+
+    const verifiedCount = filtered.filter(o => o.linkStatus === 'verified').length;
+    const probableCount = filtered.filter(o => o.linkStatus === 'probable').length;
+    const showCategoryBadge = activeCategory === 'all';
+
+    // Counts per category for nav pills
+    const catCounts = {};
+    CATEGORIES.forEach(c => {
+        catCounts[c.key] = c.key === 'all'
+            ? opportunities.length
+            : opportunities.filter(o => o.category === c.key).length;
+    });
+
+    // Visible status sections (with items)
+    const visibleSections = SECTIONS.map(s => ({
+        ...s,
+        items: filtered.filter(s.filter),
+    })).filter(s => s.items.length > 0);
 
     return (
         <div className="dashboard-container animate-in">
+
+            {/* ── Error banner ─────────────────────────────────── */}
             {error && (
                 <div style={{ background: '#2a0a0a', border: '1px solid #ff6b6b', borderRadius: '8px', padding: '1rem 1.5rem', marginBottom: '1rem', color: '#ff6b6b', fontSize: '0.9rem' }}>
                     ⚠️ <strong>Could not load latest data:</strong> {error}.
@@ -142,6 +197,7 @@ const Dashboard = () => {
                 </div>
             )}
 
+            {/* ── Refresh overlay ───────────────────────────────── */}
             {isRefreshing && (
                 <div className="refresh-overlay">
                     <div className="refresh-modal">
@@ -156,6 +212,7 @@ const Dashboard = () => {
                 </div>
             )}
 
+            {/* ── Header ───────────────────────────────────────── */}
             <header>
                 <div className="logo">
                     <h1>ABIF</h1>
@@ -176,7 +233,7 @@ const Dashboard = () => {
                 </div>
             </header>
 
-            {/* Stats row */}
+            {/* ── Stats row ─────────────────────────────────────── */}
             <section className="stats-grid">
                 <div className="stat-card">
                     <p className="scheme-body">Active Opportunities</p>
@@ -198,7 +255,41 @@ const Dashboard = () => {
                 </div>
             </section>
 
-            {/* Link verification summary */}
+            {/* ── Category Nav Bar ──────────────────────────────── */}
+            <nav className="category-nav">
+                <div className="category-nav-inner">
+                    {CATEGORIES.map(cat => (
+                        <button
+                            key={cat.key}
+                            className={`category-tab cat-${cat.key}${activeCategory === cat.key ? ' active' : ''}`}
+                            onClick={() => setActiveCategory(cat.key)}
+                        >
+                            <span className="cat-icon">{cat.icon}</span>
+                            <span className="cat-label">{cat.label}</span>
+                            <span className="cat-count">{catCounts[cat.key]}</span>
+                        </button>
+                    ))}
+                </div>
+
+                {/* Quick-jump anchors for visible sections */}
+                {visibleSections.length > 0 && (
+                    <div className="section-jumps">
+                        <span className="jump-label">Jump to:</span>
+                        {visibleSections.map(s => (
+                            <button
+                                key={s.key}
+                                className="jump-btn"
+                                onClick={() => scrollToSection(s.key)}
+                            >
+                                {s.label.split(' ').slice(0, 2).join(' ')}
+                                <span className="jump-count">{s.items.length}</span>
+                            </button>
+                        ))}
+                    </div>
+                )}
+            </nav>
+
+            {/* ── Link verification legend ─────────────────────── */}
             {(verifiedCount > 0 || probableCount > 0) && (
                 <div className="link-legend">
                     <span><span className="badge-verified">✅ Verified Link</span> — confirmed URL is reachable ({verifiedCount})</span>
@@ -206,25 +297,42 @@ const Dashboard = () => {
                 </div>
             )}
 
-            {/* Sectioned scheme cards */}
-            {SECTIONS.map(section => {
-                const items = opportunities.filter(section.filter);
-                if (items.length === 0) return null;
-                return (
-                    <div key={section.key} className="section-block">
-                        <div className="section-header" style={{ borderLeftColor: section.borderColor }}>
-                            <h2 className="section-title">{section.label}</h2>
-                            <span className="section-subtitle">{section.subtitle}</span>
-                            <span className="section-count">{items.length}</span>
-                        </div>
-                        <section className="schemes-grid">
-                            {items.map((scheme, i) => (
-                                <SchemeCard key={`${section.key}-${i}`} scheme={scheme} />
-                            ))}
-                        </section>
+            {/* ── Empty state ───────────────────────────────────── */}
+            {filtered.length === 0 && (
+                <div className="empty-state">
+                    <div className="empty-icon">🔍</div>
+                    <h3>No Opportunities Found</h3>
+                    <p>No {CATEGORIES.find(c => c.key === activeCategory)?.label} opportunities are tracked yet. Check back soon!</p>
+                    <button className="btn-apply" onClick={() => setActiveCategory('all')} style={{ marginTop: '1rem' }}>
+                        View All Opportunities
+                    </button>
+                </div>
+            )}
+
+            {/* ── Sectioned scheme cards ───────────────────────── */}
+            {visibleSections.map(section => (
+                <div
+                    key={section.key}
+                    id={section.key}
+                    ref={el => { sectionRefs.current[section.key] = el; }}
+                    className="section-block"
+                >
+                    <div className="section-header" style={{ borderLeftColor: section.borderColor }}>
+                        <h2 className="section-title">{section.label}</h2>
+                        <span className="section-subtitle">{section.subtitle}</span>
+                        <span className="section-count">{section.items.length}</span>
                     </div>
-                );
-            })}
+                    <section className="schemes-grid">
+                        {section.items.map((scheme, i) => (
+                            <SchemeCard
+                                key={`${section.key}-${i}`}
+                                scheme={scheme}
+                                showCategoryBadge={showCategoryBadge}
+                            />
+                        ))}
+                    </section>
+                </div>
+            ))}
         </div>
     );
 };
