@@ -4,25 +4,34 @@ import './index.css';
 const Dashboard = () => {
     const [opportunities, setOpportunities] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [stats, setStats] = useState({ total: 0, active: 0, closingSoon: 0 });
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [countdown, setCountdown] = useState(0);
     const [lastUpdated, setLastUpdated] = useState(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
 
     const fetchData = () => {
-        fetch('/data/opportunities.json')
-            .then(res => res.json())
+        // Use relative path (./data/...) so it works on GitHub Pages sub-path deployments
+        // Cache-busting param ensures latest data is always fetched
+        fetch(`./data/opportunities.json?v=${Date.now()}`)
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+                return res.json();
+            })
             .then(data => {
+                if (!Array.isArray(data)) throw new Error('Invalid data format received');
                 setOpportunities(data);
-                const active = data.filter(o => o.status === 'Open' || o.status === 'Rolling' || o.status === 'Coming Soon').length;
+                const active = data.filter(o => ['Open', 'Rolling', 'Coming Soon'].includes(o.status)).length;
                 const closing = data.filter(o => o.status === 'Closing Soon').length;
                 setStats({ total: data.length, active, closingSoon: closing });
+                setError(null);
                 setLoading(false);
                 setIsRefreshing(false);
                 setLastUpdated(`${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`);
             })
             .catch(err => {
                 console.error("Failed to fetch opportunities:", err);
+                setError(err.message);
                 setLoading(false);
                 setIsRefreshing(false);
             });
@@ -55,6 +64,12 @@ const Dashboard = () => {
 
     return (
         <div className="dashboard-container animate-in">
+            {error && (
+                <div style={{ background: '#2a0a0a', border: '1px solid #ff6b6b', borderRadius: '8px', padding: '1rem 1.5rem', margin: '1rem', color: '#ff6b6b', fontSize: '0.9rem' }}>
+                    ⚠️ <strong>Could not load latest data:</strong> {error}. Showing cached results if available.
+                    <button onClick={fetchData} style={{ marginLeft: '1rem', background: 'transparent', border: '1px solid #ff6b6b', color: '#ff6b6b', borderRadius: '4px', padding: '0.2rem 0.75rem', cursor: 'pointer' }}>Retry</button>
+                </div>
+            )}
             {isRefreshing && (
                 <div className="refresh-overlay">
                     <div className="refresh-modal">
