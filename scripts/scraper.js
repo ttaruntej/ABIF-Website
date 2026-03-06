@@ -228,6 +228,9 @@ async function scrapeBirac(browser) {
                     linkStatus,
                     dataSource: 'scraper:birac',
                     lastScraped: new Date().toISOString(),
+                    targetAudience: ['startup'],
+                    sectors: ['BioTech', 'MedTech', 'AgriTech'],
+                    stages: ['Ideation', 'Seed', 'Early Traction']
                 });
                 console.log(`  ✓ ${status.padEnd(12)} | ${name.substring(0, 55)}`);
             }));
@@ -329,6 +332,9 @@ async function scrapeDST(browser) {
                     linkStatus: 'verified',
                     dataSource: 'scraper:dst',
                     lastScraped: new Date().toISOString(),
+                    targetAudience: ['startup'],
+                    sectors: ['DeepTech', 'Hardware', 'Agnostic'],
+                    stages: ['Seed', 'Early Traction', 'Scale-up']
                 });
                 console.log(`  ✓ ${status.padEnd(12)} | ${name.substring(0, 55)}`);
             }));
@@ -372,6 +378,9 @@ async function scrapeSISFS(browser) {
                 linkStatus: 'verified',
                 dataSource: 'scraper:sisfs',
                 lastScraped: new Date().toISOString(),
+                targetAudience: ['startup'],
+                sectors: ['Agnostic'],
+                stages: ['Ideation', 'Prototype', 'Seed']
             },
             {
                 name: 'SISFS Incubator Grant (To act as Seed Fund partner)',
@@ -385,6 +394,9 @@ async function scrapeSISFS(browser) {
                 linkStatus: 'verified',
                 dataSource: 'scraper:sisfs:incubator',
                 lastScraped: new Date().toISOString(),
+                targetAudience: ['incubator'],
+                sectors: ['Agnostic'],
+                stages: ['All Stages']
             }
         ];
     } catch (e) {
@@ -437,6 +449,9 @@ async function scrapeSBIFoundation(browser) {
             linkStatus: applyLink !== url ? 'verified' : 'probable',
             dataSource: 'scraper:sbif',
             lastScraped: new Date().toISOString(),
+            targetAudience: ['incubator', 'startup'],
+            sectors: ['Social Impact', 'EdTech', 'HealthTech'],
+            stages: ['Seed', 'Scale-up']
         }];
     } catch (e) {
         console.error('  ✗ SBI Foundation scraper failed:', e.message);
@@ -533,6 +548,9 @@ function getStaticRecords() {
             category: 'national',
             status: 'Rolling',
             dataSource: 'scraper:sidbi',
+            targetAudience: ['startup'],
+            sectors: ['DeepTech', 'CleanTech', 'Hardware'],
+            stages: ['Early Traction', 'Scale-up']
         },
         {
             name: 'SIDBI Make in India Soft Loan Fund for MSMEs (SMILE)',
@@ -544,6 +562,9 @@ function getStaticRecords() {
             category: 'national',
             status: 'Rolling',
             dataSource: 'scraper:sidbi',
+            targetAudience: ['startup'],
+            sectors: ['Manufacturing', 'Hardware'],
+            stages: ['Early Traction', 'Scale-up']
         },
         // INCUBATOR & ACCELERATOR SPECIFIC
         {
@@ -556,6 +577,9 @@ function getStaticRecords() {
             category: 'national',
             status: 'Check Website',
             dataSource: 'manual:incubator',
+            targetAudience: ['incubator'],
+            sectors: ['Agnostic'],
+            stages: ['All Stages']
         },
         {
             name: 'DST NIDHI - Technology Business Incubator (TBI)',
@@ -567,6 +591,9 @@ function getStaticRecords() {
             category: 'national',
             status: 'Check Website',
             dataSource: 'manual:incubator',
+            targetAudience: ['incubator'],
+            sectors: ['DeepTech', 'Tech'],
+            stages: ['All Stages']
         },
         {
             name: 'MeitY TIDE 2.0 (Incubator Support)',
@@ -578,6 +605,9 @@ function getStaticRecords() {
             category: 'national',
             status: 'Check Website',
             dataSource: 'manual:incubator',
+            targetAudience: ['incubator'],
+            sectors: ['IT', 'Electronics', 'Tech'],
+            stages: ['All Stages']
         },
         {
             name: 'STPI Next Generation Incubation Scheme (NGIS) / LEAP Ahead',
@@ -589,6 +619,9 @@ function getStaticRecords() {
             category: 'national',
             status: 'Check Website',
             dataSource: 'manual:incubator',
+            targetAudience: ['incubator', 'startup'],
+            sectors: ['Software', 'IT'],
+            stages: ['Seed', 'Early Traction']
         },
         // CSR
         {
@@ -601,6 +634,9 @@ function getStaticRecords() {
             category: 'csr',
             status: 'Rolling',
             dataSource: 'manual:csr',
+            targetAudience: ['incubator', 'startup'],
+            sectors: ['Social Impact', 'Agnostic'],
+            stages: ['All Stages']
         }
     ];
 }

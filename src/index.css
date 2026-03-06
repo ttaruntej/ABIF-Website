@@ -231,6 +231,93 @@ header {
     border-radius: 10px;
 }
 
+/* ── Audience Toggle ─────────────────────────────────────────── */
+.audience-toggle {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    padding: 0.5rem;
+    background: var(--glass);
+    border-radius: 50px;
+    width: fit-content;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.audience-btn {
+    background: transparent;
+    color: var(--text-dim);
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: 50px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.audience-btn:hover {
+    color: var(--text-main);
+}
+
+.audience-btn.active {
+    background: rgba(100, 255, 218, 0.15);
+    color: var(--secondary);
+    box-shadow: 0 4px 15px rgba(100, 255, 218, 0.1);
+}
+
+/* ── Sector Nav Bar ─────────────────────────────────────────── */
+.sector-nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px dashed var(--glass-border);
+}
+
+.sector-tab {
+    background: transparent;
+    border: 1px solid var(--glass-border);
+    color: var(--text-dim);
+    padding: 0.3rem 0.8rem;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.sector-tab:hover {
+    border-color: var(--text-dim);
+    color: var(--text-main);
+}
+
+.sector-tab.active {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    border-color: var(--text-main);
+}
+
+.pill-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-top: 0.5rem;
+}
+
+.pill-tag {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-dim);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.65rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
 /* ── Scheme Cards ───────────────────────────────────────────── */
 .schemes-grid {
     display: grid;

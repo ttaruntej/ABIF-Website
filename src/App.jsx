@@ -82,7 +82,15 @@ const SchemeCard = ({ scheme, showCategoryBadge }) => {
             <p className="scheme-body" style={{ fontSize: '0.8rem', fontWeight: 'bold', color: 'var(--secondary)' }}>
                 {scheme.body}
             </p>
-            <p className="scheme-body">{scheme.description}</p>
+
+            {(scheme.sectors || scheme.stages) && (
+                <div className="pill-container">
+                    {scheme.stages?.map(s => <span key={s} className="pill-tag">{s}</span>)}
+                    {scheme.sectors?.map(s => <span key={s} className="pill-tag" style={{ borderColor: 'var(--secondary)', color: 'var(--secondary)' }}>{s}</span>)}
+                </div>
+            )}
+
+            <p className="scheme-body" style={{ marginTop: '0.5rem' }}>{scheme.description}</p>
 
             <div className="scheme-footer">
                 <span className="award-amount">{scheme.maxAward}</span>
@@ -117,7 +125,9 @@ const Dashboard = () => {
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [refreshSuccess, setRefreshSuccess] = useState(false);
     const [countdown, setCountdown] = useState(0);
+    const [activeAudience, setActiveAudience] = useState('startup'); // 'startup' | 'incubator' | 'all'
     const [activeCategory, setActiveCategory] = useState('all');
+    const [activeSector, setActiveSector] = useState('All Sectors');
     const [currentView, setCurrentView] = useState('dashboard'); // 'dashboard' | 'archive'
     const [lastUpdated, setLastUpdated] = useState(
         `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
@@ -222,27 +232,70 @@ const Dashboard = () => {
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
+    const handleExportCSV = () => {
+        const headers = ['Name', 'Provider', 'Category', 'Target Audience', 'Sectors', 'Stages', 'Max Award', 'Deadline', 'Status', 'Link'];
+        const csvRows = [headers.join(',')];
+
+        filtered.forEach(o => {
+            const row = [
+                `"${o.name.replace(/"/g, '""')}"`,
+                `"${(o.body || '').replace(/"/g, '""')}"`,
+                o.category,
+                `"${(o.targetAudience || []).join(', ')}"`,
+                `"${(o.sectors || []).join(', ')}"`,
+                `"${(o.stages || []).join(', ')}"`,
+                `"${(o.maxAward || '').replace(/"/g, '""')}"`,
+                `"${(o.deadline || '').replace(/"/g, '""')}"`,
+                o.status,
+                `"${o.link}"`
+            ];
+            csvRows.push(row.join(','));
+        });
+
+        const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('hidden', '');
+        a.setAttribute('href', url);
+        a.setAttribute('download', `abif_funding_export_${new Date().toISOString().split('T')[0]}.csv`);
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    };
+
     if (loading) return (
         <div style={{ backgroundColor: '#020c1b', height: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#64ffda', fontFamily: 'Inter' }}>
             Loading ABIF Funding Tracker...
         </div>
     );
 
-    // Filtered set for current category tab
-    const filtered = activeCategory === 'all'
+    // Filtered set based on Audience Toggle
+    const filteredByAudience = activeAudience === 'all'
         ? opportunities
-        : opportunities.filter(o => (o.category || '').toLowerCase() === activeCategory);
+        : opportunities.filter(o => o.targetAudience && o.targetAudience.includes(activeAudience));
+
+    // Get available sectors for the Nav Bar
+    const availableSectors = Array.from(new Set(filteredByAudience.flatMap(o => o.sectors || []))).sort();
+
+    // Filter by Sector
+    const filteredBySector = activeSector === 'All Sectors'
+        ? filteredByAudience
+        : filteredByAudience.filter(o => o.sectors && o.sectors.includes(activeSector));
+
+    // Filter by Category Tab
+    const filtered = activeCategory === 'all'
+        ? filteredBySector
+        : filteredBySector.filter(o => (o.category || '').toLowerCase() === activeCategory);
 
     const verifiedCount = filtered.filter(o => o.linkStatus === 'verified').length;
     const probableCount = filtered.filter(o => o.linkStatus === 'probable').length;
     const showCategoryBadge = activeCategory === 'all';
 
-    // Counts per category for nav pills
     const catCounts = {};
     CATEGORIES.forEach(c => {
         catCounts[c.key] = c.key === 'all'
-            ? opportunities.length
-            : opportunities.filter(o => o.category === c.key).length;
+            ? filteredBySector.length
+            : filteredBySector.filter(o => o.category === c.key).length;
     });
 
     // Visible status sections (with items)
@@ -307,6 +360,9 @@ const Dashboard = () => {
                     >
                         {currentView === 'dashboard' ? '🗄️ View Archive' : '📊 Back to Dashboard'}
                     </button>
+                    <button className="btn-refresh" onClick={handleExportCSV} style={{ marginRight: '0.5rem', borderColor: 'var(--text-dim)', color: 'var(--text-main)' }}>
+                        📥 Export to CSV
+                    </button>
                     <button className="btn-refresh" onClick={handleRefresh} disabled={isRefreshing}>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                             <path d="M23 4v6h-6"></path>
@@ -324,6 +380,28 @@ const Dashboard = () => {
             {/* ── Main Dashboard View ────────────────────────────── */}
             {currentView === 'dashboard' ? (
                 <>
+                    {/* ── Audience Toggle ───────────────────────────────── */}
+                    <div className="audience-toggle">
+                        <button
+                            className={`audience-btn ${activeAudience === 'startup' ? 'active' : ''}`}
+                            onClick={() => { setActiveAudience('startup'); setActiveSector('All Sectors'); }}
+                        >
+                            🚀 For My Startups
+                        </button>
+                        <button
+                            className={`audience-btn ${activeAudience === 'incubator' ? 'active' : ''}`}
+                            onClick={() => { setActiveAudience('incubator'); setActiveSector('All Sectors'); }}
+                        >
+                            🏢 For My Incubator
+                        </button>
+                        <button
+                            className={`audience-btn ${activeAudience === 'all' ? 'active' : ''}`}
+                            onClick={() => { setActiveAudience('all'); setActiveSector('All Sectors'); }}
+                        >
+                            🌐 All Grants
+                        </button>
+                    </div>
+
                     {/* ── Stats row ─────────────────────────────────────── */}
                     <section className="stats-grid">
                         <div className="stat-card">
@@ -358,6 +436,25 @@ const Dashboard = () => {
                                     <span className="cat-icon">{cat.icon}</span>
                                     <span className="cat-label">{cat.label}</span>
                                     <span className="cat-count">{catCounts[cat.key]}</span>
+                                </button>
+                            ))}
+                        </div>
+
+                        {/* Sector specific filters */}
+                        <div className="sector-nav">
+                            <button
+                                className={`sector-tab ${activeSector === 'All Sectors' ? 'active' : ''}`}
+                                onClick={() => setActiveSector('All Sectors')}
+                            >
+                                All Sectors
+                            </button>
+                            {availableSectors.map(sec => (
+                                <button
+                                    key={sec}
+                                    className={`sector-tab ${activeSector === sec ? 'active' : ''}`}
+                                    onClick={() => setActiveSector(sec)}
+                                >
+                                    {sec}
                                 </button>
                             ))}
                         </div>
