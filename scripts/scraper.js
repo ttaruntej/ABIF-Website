@@ -301,19 +301,34 @@ async function scrapeSISFS(browser) {
         const status = isHardClosed ? 'Closed' : 'Rolling';
 
         console.log(`  ✓ SISFS status: ${status}`);
-        return [{
-            name: 'Startup India Seed Fund Scheme (SISFS)',
-            body: 'DPIIT / Startup India',
-            maxAward: 'Up to ₹50 Lakhs',
-            deadline: 'Rolling (Open All Year)',
-            link: url,
-            description: 'Financial assistance to startups for proof of concept, prototype development, product trials, market entry, and commercialization.',
-            category: 'national',
-            status,
-            linkStatus: 'verified',
-            dataSource: 'scraper:sisfs',
-            lastScraped: new Date().toISOString(),
-        }];
+        return [
+            {
+                name: 'Startup India Seed Fund Scheme (SISFS) for Startups',
+                body: 'DPIIT / Startup India',
+                maxAward: 'Up to ₹50 Lakhs',
+                deadline: 'Rolling (Open All Year)',
+                link: url,
+                description: 'Financial assistance to startups for proof of concept, prototype development, product trials, market entry, and commercialization.',
+                category: 'national',
+                status,
+                linkStatus: 'verified',
+                dataSource: 'scraper:sisfs',
+                lastScraped: new Date().toISOString(),
+            },
+            {
+                name: 'SISFS Incubator Grant (To act as Seed Fund partner)',
+                body: 'DPIIT / Startup India',
+                maxAward: 'Up to ₹5 Crores',
+                deadline: 'Rolling (Open All Year)',
+                link: url,
+                description: 'Grant given to eligible incubators (operational > 2-3 years) to distribute seed funding to startups under the SISFS track.',
+                category: 'national',
+                status,
+                linkStatus: 'verified',
+                dataSource: 'scraper:sisfs:incubator',
+                lastScraped: new Date().toISOString(),
+            }
+        ];
     } catch (e) {
         console.error('  ✗ SISFS scraper failed:', e.message);
         return [];
@@ -439,10 +454,11 @@ async function verifyStaticRecords(browser, staticRecords) {
     return updated;
 }
 
-// ─── SIDBI (Static Rolling — no cyclic calls) ────────────────────────────────
+// ─── STATIC RECORDS (SIDBI, INCUBATOR GRANTS, CSR) ─────────────────────────
 
-function getSIDBIRecords() {
+function getStaticRecords() {
     return [
+        // SIDBI
         {
             name: 'SIDBI Revolving Fund for Technology Innovation (SRIJAN)',
             body: 'SIDBI',
@@ -465,6 +481,63 @@ function getSIDBIRecords() {
             status: 'Rolling',
             dataSource: 'scraper:sidbi',
         },
+        // INCUBATOR & ACCELERATOR SPECIFIC
+        {
+            name: 'Atal Incubation Centre (AIC) Establishment Grant',
+            body: 'Atal Innovation Mission (NITI Aayog)',
+            maxAward: 'Up to ₹10 Crores (over 5 years)',
+            deadline: 'Varies',
+            link: 'https://aim.gov.in/aic.php',
+            description: 'Financial support of up to ₹10 crores to eligible institutions/organizations to establish new Atal Incubation Centres.',
+            category: 'national',
+            status: 'Check Website',
+            dataSource: 'manual:incubator',
+        },
+        {
+            name: 'DST NIDHI - Technology Business Incubator (TBI)',
+            body: 'DST (MoST)',
+            maxAward: 'Grants & Operating Support',
+            deadline: 'Varies',
+            link: 'https://nidhi.dst.gov.in/',
+            description: 'Funding to set up TBIs and establish Seed Support Systems (SSS) which give incubators up to ₹10 Cr to invest in their portfolio.',
+            category: 'national',
+            status: 'Check Website',
+            dataSource: 'manual:incubator',
+        },
+        {
+            name: 'MeitY TIDE 2.0 (Incubator Support)',
+            body: 'MeitY Startup Hub',
+            maxAward: 'Grants & Investment Support',
+            deadline: 'Varies',
+            link: 'https://vc.meity.gov.in/tide2.0/',
+            description: 'Technology Incubation and Development of Entrepreneurs providing financial/technical support to incubators supporting ICT startups.',
+            category: 'national',
+            status: 'Check Website',
+            dataSource: 'manual:incubator',
+        },
+        {
+            name: 'STPI Next Generation Incubation Scheme (NGIS) / LEAP Ahead',
+            body: 'STPI (MeitY)',
+            maxAward: 'Up to ₹25 Lakhs',
+            deadline: 'Varies by Challenge',
+            link: 'https://www.stpi.in/en/next-generation-incubation-scheme',
+            description: 'Incubation facilities, seed funding edge, and mentorship for startups in Tier II/III cities via local STPI centers.',
+            category: 'national',
+            status: 'Check Website',
+            dataSource: 'manual:incubator',
+        },
+        // CSR
+        {
+            name: 'India Investment Grid (IIG) – CSR Opportunities Portal',
+            body: 'Invest India / Govt of India',
+            maxAward: 'Varies by Corporate Partner',
+            deadline: 'Rolling (Open All Year)',
+            link: 'https://indiainvestmentgrid.gov.in/opportunities/csr',
+            description: 'Official portal connecting Section 8 Incubators with corporate CSR mandates. Incubators can list projects to secure 2% CSR grants.',
+            category: 'csr',
+            status: 'Rolling',
+            dataSource: 'manual:csr',
+        }
     ];
 }
 
@@ -568,8 +641,10 @@ async function runScrapers() {
     allScraped.push(...sisfsData, ...sbifData);
 
     // ── Add SIDBI static records NOW — before building scrapedLinks ──
-    // This ensures SIDBI is excluded from Tier-B URL verification
-    allScraped.push(...getSIDBIRecords());
+    // This ensures SIDBI is explicitly excluded from Tier-B URL verification
+    // (since its URLs are stable and we don't need to ping them).
+    const sidbiRecords = getStaticRecords().filter(r => r.dataSource === 'scraper:sidbi');
+    allScraped.push(...sidbiRecords);
 
     await browser.close();
     console.log(`\n  Tier A+C scraped: ${allScraped.length} entries`);
@@ -584,6 +659,15 @@ async function runScrapers() {
             console.error('  Could not parse existing data. Starting fresh.', e.message);
         }
     }
+    // ── Inject Incubator/CSR static targets into existingData so Tier B verifies them ──
+    const targetStaticRecords = getStaticRecords().filter(r => r.dataSource !== 'scraper:sidbi');
+
+    // Merge new static records into existingData if they aren't already there
+    targetStaticRecords.forEach(tsr => {
+        if (!existingData.some(e => e.link === tsr.link)) {
+            existingData.push(tsr);
+        }
+    });
 
     // ── Tier B: Verify all static records (those without lastScraped or not covered by Tier A/C) ──
     const scrapedLinks = new Set(allScraped.map(x => x.link));
