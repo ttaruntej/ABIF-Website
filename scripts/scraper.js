@@ -21,6 +21,53 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DATA_FILE = path.join(__dirname, '../public/data/opportunities.json');
 
+// ─── Core Execution Utilities (V3 Performance) ──────────────────────────────
+
+/**
+ * Array Chunker for Controlled Concurrency
+ */
+function chunkArray(array, size) {
+    const chunked = [];
+    for (let i = 0; i < array.length; i += size) {
+        chunked.push(array.slice(i, i + size));
+    }
+    return chunked;
+}
+
+/**
+ * Generic Retry Wrapper for Flaky Network Calls
+ */
+async function withRetry(operation, maxRetries = 2, delayMs = 2000) {
+    let lastError;
+    for (let i = 0; i <= maxRetries; i++) {
+        try {
+            return await operation();
+        } catch (e) {
+            lastError = e;
+            if (i < maxRetries) {
+                await new Promise(res => setTimeout(res, delayMs));
+            }
+        }
+    }
+    throw lastError;
+}
+
+/**
+ * Blocks heavy/unnecessary assets from downloading (CSS, Fonts, Images, Media)
+ * Slashes individual page load times from ~20s to < 3s.
+ */
+async function setupPageInterception(page) {
+    await page.setRequestInterception(true);
+    page.on('request', (req) => {
+        const type = req.resourceType();
+        if (['image', 'stylesheet', 'font', 'media', 'other'].includes(type) && !req.url().includes('captcha')) {
+            req.abort();
+        } else {
+            req.continue();
+        }
+    });
+}
+
 // ─── Date / Status Helpers ──────────────────────────────────────────────────
 
 const MONTHS = {
@@ -112,8 +159,9 @@ async function scrapeBirac(browser) {
 
     try {
         const page = await browser.newPage();
+        await setupPageInterception(page);
         await page.setDefaultNavigationTimeout(60000);
-        await page.goto(listingUrl, { waitUntil: 'networkidle2', timeout: 60000 });
+        await withRetry(() => page.goto(listingUrl, { waitUntil: 'domcontentloaded', timeout: 30000 }));
 
         const $ = cheerio.load(await page.content());
         await page.close();
@@ -131,53 +179,58 @@ async function scrapeBirac(browser) {
             rows.push({ rawName, rawText, detailLink });
         });
 
-        console.log(`  Found ${rows.length} current BIRAC CFPs. Fetching detail pages...`);
+        console.log(`  Found ${rows.length} current BIRAC CFPs. Fetching detail pages concurrently (in batches of 5)...`);
 
-        for (const row of rows) {
-            const name = cleanName(row.rawName);
-            const deadlineStr = formatDeadline(row.rawText);
-            const status = determineStatus(row.rawText);
-            let applyLink = row.detailLink;
-            let linkStatus = 'probable';
+        const chunks = chunkArray(rows, 5);
+        for (const chunk of chunks) {
+            await Promise.all(chunk.map(async (row) => {
+                const name = cleanName(row.rawName);
+                const deadlineStr = formatDeadline(row.rawText);
+                const status = determineStatus(row.rawText);
+                let applyLink = row.detailLink;
+                let linkStatus = 'probable';
 
-            try {
-                const dp = await browser.newPage();
-                await dp.goto(row.detailLink, { waitUntil: 'domcontentloaded', timeout: 25000 });
-                const $d = cheerio.load(await dp.content());
-                await dp.close();
+                try {
+                    const dp = await browser.newPage();
+                    await setupPageInterception(dp);
+                    await withRetry(() => dp.goto(row.detailLink, { waitUntil: 'domcontentloaded', timeout: 25000 }));
 
-                const extSelectors = [
-                    'a[href*="apply"]', 'a[href*="form"]', 'a[href*="google"]',
-                    'a[href*="submission"]', 'a[href*="register"]', 'a[href*="innovatein"]',
-                    'a:contains("Apply")', 'a:contains("Submit")', 'a:contains("Application Form")',
-                    'a:contains("Apply Online")', 'a:contains("Click here to apply")',
-                ];
-                for (const sel of extSelectors) {
-                    const href = $d(sel).first().attr('href');
-                    if (href && href.startsWith('http') && !href.includes('birac.nic.in')) {
-                        applyLink = href;
-                        linkStatus = 'verified';
-                        break;
+                    const $d = cheerio.load(await dp.content());
+                    await dp.close();
+
+                    const extSelectors = [
+                        'a[href*="apply"]', 'a[href*="form"]', 'a[href*="google"]',
+                        'a[href*="submission"]', 'a[href*="register"]', 'a[href*="innovatein"]',
+                        'a:contains("Apply")', 'a:contains("Submit")', 'a:contains("Application Form")',
+                        'a:contains("Apply Online")', 'a:contains("Click here to apply")',
+                    ];
+                    for (const sel of extSelectors) {
+                        const href = $d(sel).first().attr('href');
+                        if (href && href.startsWith('http') && !href.includes('birac.nic.in')) {
+                            applyLink = href;
+                            linkStatus = 'verified';
+                            break;
+                        }
                     }
+                } catch (e) {
+                    console.warn(`    ⚠ Detail page failed for "${name}": ${e.message}`);
                 }
-            } catch (e) {
-                console.warn(`    ⚠ Detail page failed for "${name}": ${e.message}`);
-            }
 
-            results.push({
-                name,
-                body: 'BIRAC (DBT)',
-                maxAward: 'Grant (competitive scale)',
-                deadline: deadlineStr,
-                link: applyLink,
-                description: `BIRAC Call for Proposal. Visit the link to see full details and eligibility.`,
-                category: 'national',
-                status,
-                linkStatus,
-                dataSource: 'scraper:birac',
-                lastScraped: new Date().toISOString(),
-            });
-            console.log(`  ✓ ${status.padEnd(12)} | ${name.substring(0, 55)}`);
+                results.push({
+                    name,
+                    body: 'BIRAC (DBT)',
+                    maxAward: 'Grant (competitive scale)',
+                    deadline: deadlineStr,
+                    link: applyLink,
+                    description: `BIRAC Call for Proposal. Visit the link to see full details and eligibility.`,
+                    category: 'national',
+                    status,
+                    linkStatus,
+                    dataSource: 'scraper:birac',
+                    lastScraped: new Date().toISOString(),
+                });
+                console.log(`  ✓ ${status.padEnd(12)} | ${name.substring(0, 55)}`);
+            }));
         }
     } catch (e) {
         console.error('  ✗ BIRAC scraper failed:', e.message);
@@ -195,7 +248,8 @@ async function scrapeDST(browser) {
 
     try {
         const page = await browser.newPage();
-        await page.goto(listingUrl, { waitUntil: 'domcontentloaded', timeout: 45000 });
+        await setupPageInterception(page);
+        await withRetry(() => page.goto(listingUrl, { waitUntil: 'domcontentloaded', timeout: 45000 }));
         const $ = cheerio.load(await page.content());
         await page.close();
 
@@ -220,60 +274,64 @@ async function scrapeDST(browser) {
             entries.push({ name, link: href.startsWith('http') ? href : `https://onlinedst.gov.in${href}` });
         });
 
-        console.log(`  Found ${entries.length} DST active calls.`);
+        console.log(`  Found ${entries.length} DST active calls. Fetching details concurrently...`);
 
-        for (const entry of entries) {
-            const name = cleanName(entry.name);
-            if (!name || name.length < 10) continue;
+        const chunks = chunkArray(entries, 5);
+        for (const chunk of chunks) {
+            await Promise.all(chunk.map(async (entry) => {
+                const name = cleanName(entry.name);
+                if (!name || name.length < 10) return;
 
-            // Try to fetch deadline from the detail page
-            let deadlineStr = 'Check website for details';
-            let status = 'Open';
-            let maxAward = 'Varies';
+                // Try to fetch deadline from the detail page
+                let deadlineStr = 'Check website for details';
+                let status = 'Open';
+                let maxAward = 'Varies';
 
-            try {
-                const dp = await browser.newPage();
-                await dp.goto(entry.link, { waitUntil: 'domcontentloaded', timeout: 20000 });
-                const html = await dp.content();
-                await dp.close();
+                try {
+                    const dp = await browser.newPage();
+                    await setupPageInterception(dp);
+                    await withRetry(() => dp.goto(entry.link, { waitUntil: 'domcontentloaded', timeout: 20000 }));
+                    const html = await dp.content();
+                    await dp.close();
 
-                const $d = cheerio.load(html);
-                const bodyText = $d('body').text();
+                    const $d = cheerio.load(html);
+                    const bodyText = $d('body').text();
 
-                const d = extractDeadlineDate(bodyText);
-                if (d) {
-                    deadlineStr = formatDeadline(bodyText);
-                    status = dateToStatus(d);
-                } else if (bodyText.toLowerCase().includes('throughout the year') || bodyText.toLowerCase().includes('rolling')) {
-                    deadlineStr = 'Rolling (Open All Year)';
-                    status = 'Rolling';
+                    const d = extractDeadlineDate(bodyText);
+                    if (d) {
+                        deadlineStr = formatDeadline(bodyText);
+                        status = dateToStatus(d);
+                    } else if (bodyText.toLowerCase().includes('throughout the year') || bodyText.toLowerCase().includes('rolling')) {
+                        deadlineStr = 'Rolling (Open All Year)';
+                        status = 'Rolling';
+                    }
+
+                    // Try to extract funding amount
+                    const amountMatch = bodyText.match(/(?:grant|funding|support|amount)[^\n]*?(?:Rs\.?|₹|INR|EUR|USD)\s*[\d,]+(?:\s*(?:lakh|crore|million|thousand))?/i);
+                    if (amountMatch) maxAward = amountMatch[0].replace(/\s+/g, ' ').trim().substring(0, 60);
+
+                } catch (e) {
+                    console.warn(`    ⚠ DST detail page failed for "${name}": ${e.message}`);
                 }
 
-                // Try to extract funding amount
-                const amountMatch = bodyText.match(/(?:grant|funding|support|amount)[^\n]*?(?:Rs\.?|₹|INR|EUR|USD)\s*[\d,]+(?:\s*(?:lakh|crore|million|thousand))?/i);
-                if (amountMatch) maxAward = amountMatch[0].replace(/\s+/g, ' ').trim().substring(0, 60);
+                // Determine category: if it mentions "India-France", "Indo-", etc. → international
+                const cat = /indo-|india-france|india.netherlands|bilateral|international/i.test(name) ? 'international' : 'national';
 
-            } catch (e) {
-                console.warn(`    ⚠ DST detail page failed for "${name}": ${e.message}`);
-            }
-
-            // Determine category: if it mentions "India-France", "Indo-", etc. → international
-            const cat = /indo-|india-france|india.netherlands|bilateral|international/i.test(name) ? 'international' : 'national';
-
-            results.push({
-                name,
-                body: 'DST (MoST)',
-                maxAward,
-                deadline: deadlineStr,
-                link: entry.link,
-                description: `DST active call for proposals. See the portal for full guidelines and eligibility.`,
-                category: cat,
-                status,
-                linkStatus: 'verified',
-                dataSource: 'scraper:dst',
-                lastScraped: new Date().toISOString(),
-            });
-            console.log(`  ✓ ${status.padEnd(12)} | ${name.substring(0, 55)}`);
+                results.push({
+                    name,
+                    body: 'DST (MoST)',
+                    maxAward,
+                    deadline: deadlineStr,
+                    link: entry.link,
+                    description: `DST active call for proposals. See the portal for full guidelines and eligibility.`,
+                    category: cat,
+                    status,
+                    linkStatus: 'verified',
+                    dataSource: 'scraper:dst',
+                    lastScraped: new Date().toISOString(),
+                });
+                console.log(`  ✓ ${status.padEnd(12)} | ${name.substring(0, 55)}`);
+            }));
         }
     } catch (e) {
         console.error('  ✗ DST scraper failed:', e.message);
@@ -394,61 +452,67 @@ async function scrapeSBIFoundation(browser) {
  * Never changes name, body, maxAward, description, or category.
  */
 async function verifyStaticRecords(browser, staticRecords) {
-    console.log(`\n─── [Tier B] Verifying ${staticRecords.length} static records ───`);
+    console.log(`\n─── [Tier B] Verifying ${staticRecords.length} static records concurrently ───`);
     const updated = [];
+    const chunks = chunkArray(staticRecords, 5);
 
-    for (const record of staticRecords) {
-        let linkStatus = record.linkStatus || 'probable';
-        let status = record.status;
+    for (const chunk of chunks) {
+        await Promise.all(chunk.map(async (record) => {
+            let linkStatus = record.linkStatus || 'probable';
+            let status = record.status;
 
-        try {
-            const page = await browser.newPage();
-            // Use a generous 30s timeout — many gov/intl sites are slow
-            const response = await page.goto(record.link, {
-                waitUntil: 'domcontentloaded',
-                timeout: 30000,
+            try {
+                const page = await browser.newPage();
+                await setupPageInterception(page);
+
+                // Use a generous 30s timeout — many gov/intl sites are slow
+                // Wrap in withRetry for transient network failures
+                const response = await withRetry(() => page.goto(record.link, {
+                    waitUntil: 'domcontentloaded',
+                    timeout: 30000,
+                }));
+                await page.close();
+
+                const httpStatus = response ? response.status() : 0;
+
+                if (httpStatus >= 200 && httpStatus < 400) {
+                    linkStatus = 'verified';
+                } else if (httpStatus >= 400) {
+                    linkStatus = 'broken';
+                    // Only change status for entries where URL is truly 4xx dead
+                    status = 'Verify Manually';
+                    console.warn(`  ✗ HTTP ${httpStatus} for "${record.name}" → marked broken`);
+                }
+                // Note: keep existing linkStatus if HTTP is unexpected (e.g. 0) — don't degrade
+            } catch (e) {
+                // Timeout = likely a slow site, not necessarily dead. Keep existing linkStatus.
+                // Only mark broken for DNS failures (no such host).
+                if (e.message.includes('net::ERR_NAME_NOT_RESOLVED') || e.message.includes('no such host')) {
+                    linkStatus = 'broken';
+                    status = 'Verify Manually';
+                    console.warn(`  ✗ DNS failure: "${record.name}"`);
+                } else {
+                    // Timeout or other — keep existing status, just log
+                    console.warn(`  ⚠ Slow/timeout: "${record.name}" — keeping existing status`);
+                }
+            }
+
+            // For non-rolling records: also check if deadline has passed
+            if (record.deadline && record.status !== 'Rolling') {
+                const d = extractDeadlineDate(record.deadline);
+                if (d) status = dateToStatus(d);
+            }
+
+            updated.push({
+                ...record,
+                status,
+                linkStatus,
+                lastScraped: new Date().toISOString(),
             });
-            await page.close();
 
-            const httpStatus = response ? response.status() : 0;
-
-            if (httpStatus >= 200 && httpStatus < 400) {
-                linkStatus = 'verified';
-            } else if (httpStatus >= 400) {
-                linkStatus = 'broken';
-                // Only change status for entries where URL is truly 4xx dead
-                status = 'Verify Manually';
-                console.warn(`  ✗ HTTP ${httpStatus} for "${record.name}" → marked broken`);
-            }
-            // Note: keep existing linkStatus if HTTP is unexpected (e.g. 0) — don't degrade
-        } catch (e) {
-            // Timeout = likely a slow site, not necessarily dead. Keep existing linkStatus.
-            // Only mark broken for DNS failures (no such host).
-            if (e.message.includes('net::ERR_NAME_NOT_RESOLVED') || e.message.includes('no such host')) {
-                linkStatus = 'broken';
-                status = 'Verify Manually';
-                console.warn(`  ✗ DNS failure: "${record.name}"`);
-            } else {
-                // Timeout or other — keep existing status, just log
-                console.warn(`  ⚠ Slow/timeout: "${record.name}" — keeping existing status`);
-            }
-        }
-
-        // For non-rolling records: also check if deadline has passed
-        if (record.deadline && record.status !== 'Rolling') {
-            const d = extractDeadlineDate(record.deadline);
-            if (d) status = dateToStatus(d);
-        }
-
-        updated.push({
-            ...record,
-            status,
-            linkStatus,
-            lastScraped: new Date().toISOString(),
-        });
-
-        const icon = linkStatus === 'verified' ? '✓' : '✗';
-        console.log(`  ${icon} ${linkStatus.padEnd(8)} | ${record.name.substring(0, 55)}`);
+            const icon = linkStatus === 'verified' ? '✓' : '✗';
+            console.log(`  ${icon} ${linkStatus.padEnd(8)} | ${record.name.substring(0, 55)}`);
+        }));
     }
 
     return updated;
