@@ -1,6 +1,9 @@
 name: Daily Funding Scraper Sync
 
 on:
+  push:
+    branches:
+      - main
   schedule:
     # Runs at 00:00 UTC every day
     - cron: '0 0 * * *'
