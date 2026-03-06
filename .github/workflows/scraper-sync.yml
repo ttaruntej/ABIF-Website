@@ -1,5 +1,9 @@
 name: Daily Funding Scraper Sync
 
+concurrency:
+  group: scraper-sync-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches:

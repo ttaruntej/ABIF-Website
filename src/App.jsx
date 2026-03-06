@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './index.css';
 
-import { fetchOpportunities } from './services/api';
+import { fetchOpportunities, triggerScraper } from './services/api';
 import { exportToCSV } from './utils/csvExporter';
 import { generateBriefing } from './utils/aiBriefing';
 import { SECTIONS, CATEGORIES } from './constants/tracker';
@@ -70,10 +70,19 @@ const Dashboard = () => {
         return () => clearTimeout(timer);
     }, [isRefreshing, countdown, refreshSuccess]);
 
-    const handleRefresh = () => {
+    const handleRefresh = async () => {
         setIsRefreshing(true);
         setRefreshSuccess(false);
         setCountdown(3);
+
+        try {
+            // Trigger the real backend scraper via the proxy
+            await triggerScraper();
+            console.log('Backend sync triggered successfully');
+        } catch (err) {
+            console.error('Trigger failed:', err.message);
+            // We don't block the UI refresh if the trigger fails (might be local dev)
+        }
     };
 
     const scrollToSection = (key) => {
@@ -142,8 +151,8 @@ const Dashboard = () => {
                                 <div className="flex items-center gap-4 animate-in zoom-in-95 duration-300">
                                     <div className="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500 flex items-center justify-center text-emerald-400 font-bold shadow-[0_0_15px_rgba(16,185,129,0.3)]">✓</div>
                                     <div>
-                                        <h3 className="font-bold text-emerald-400 m-0">Dashboard Updated!</h3>
-                                        <p className="text-xs text-slate-400 m-0">Successfully synced latest data.</p>
+                                        <h3 className="font-bold text-emerald-400 m-0">Sync Commanded!</h3>
+                                        <p className="text-xs text-slate-400 m-0">The scraper is starting on the server. Updates will appear in ~5 mins.</p>
                                     </div>
                                 </div>
                             ) : (

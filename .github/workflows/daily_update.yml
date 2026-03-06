@@ -1,5 +1,9 @@
 name: Daily Funding Tracker Update
 
+concurrency:
+  group: daily-update-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   schedule:
     - cron: '0 3 * * *' # 9:00 AM IST (approx 3:30 AM UTC)
