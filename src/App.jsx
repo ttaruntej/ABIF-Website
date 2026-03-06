@@ -102,7 +102,7 @@ const Dashboard = () => {
     const [opportunities, setOpportunities] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [stats, setStats] = useState({ total: 0, active: 0, closingSoon: 0 });
+    const [stats, setStats] = useState({ total: 0, active: 0, closingSoon: 0, briefing: "Generating insights..." });
     const [isRefreshing, setIsRefreshing] = useState(false);
     const [refreshSuccess, setRefreshSuccess] = useState(false);
     const [countdown, setCountdown] = useState(0);
@@ -111,6 +111,42 @@ const Dashboard = () => {
         `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
     );
     const sectionRefs = useRef({});
+
+    // Generate AI Briefing string dynamically
+    const generateBriefing = (data) => {
+        if (!data || data.length === 0) return "No opportunities currently tracked.";
+
+        const activeData = data.filter(s => ['Open', 'Rolling', 'Closing Soon'].includes(s.status));
+
+        const providerCounts = {};
+        activeData.forEach(s => {
+            if (s.body) {
+                const provider = s.body.split('/')[0].trim();
+                providerCounts[provider] = (providerCounts[provider] || 0) + 1;
+            }
+        });
+
+        const topProviders = Object.entries(providerCounts)
+            .sort(([, a], [, b]) => b - a)
+            .slice(0, 2)
+            .map(([name]) => name);
+
+        const highValueOp = activeData.find(s => s.maxAward && /(Crore|Cr)/i.test(s.maxAward));
+
+        let briefing = `Currently tracking ${activeData.length} active funding opportunities. `;
+
+        if (topProviders.length > 0) {
+            briefing += `Major calls are driven by ${topProviders.join(' & ')}. `;
+        }
+
+        if (highValueOp) {
+            briefing += `Notable high-value funding includes '${highValueOp.name}' offering ${highValueOp.maxAward}.`;
+        } else {
+            briefing += `Continuous rolling funding for MSMEs and startups remains highly active.`;
+        }
+
+        return briefing;
+    };
 
     // Fetch from the static JSON file
     const fetchData = () => {
@@ -125,7 +161,8 @@ const Dashboard = () => {
                 setOpportunities(data);
                 const active = data.filter(o => ['Open', 'Rolling', 'Coming Soon'].includes(o.status)).length;
                 const closing = data.filter(o => o.status === 'Closing Soon').length;
-                setStats({ total: data.length, active, closingSoon: closing });
+                const dynamicBriefing = generateBriefing(data);
+                setStats({ total: data.length, active, closingSoon: closing, briefing: dynamicBriefing });
                 setError(null);
                 setLoading(false);
                 setLastUpdated(
@@ -274,7 +311,7 @@ const Dashboard = () => {
                 <div className="stat-card" style={{ gridColumn: 'span 2', textAlign: 'left', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
                     <p className="scheme-body" style={{ color: 'var(--secondary)', fontWeight: 'bold' }}>AI Research Briefing</p>
                     <p className="scheme-body" style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
-                        "Current focuses span AI, Assistive Tech, and hardware. Major calls open via BIRAC & DST. Continuous rolling funding for MSMEs and startups is highly active through SIDBI (SMILE/SRIJAN) and DPIIT (SISFS) with upper limits up to ₹5 Crores."
+                        {stats.briefing}
                     </p>
                 </div>
                 <div className="stat-card">
