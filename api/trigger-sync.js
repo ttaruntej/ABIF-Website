@@ -1,44 +1,68 @@
 /**
- * Serverless Function to trigger GitHub Action
- * This should be hosted on a platform like Vercel or Netlify.
+ * Serverless Function to trigger or check GitHub Action status
  */
 export default async function handler(req, res) {
-    if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
-    }
-
     const GH_TOKEN = process.env.GH_TOKEN;
-    const REPO_OWNER = 'ttaruntej'; // Your GitHub username
+    const REPO_OWNER = 'ttaruntej';
     const REPO_NAME = 'ABIF-Funding-Tracker';
-    const WORKFLOW_ID = 'scraper-sync.yml'; // The filename of your workflow
+    const WORKFLOW_ID = 'scraper-sync.yml';
 
     if (!GH_TOKEN) {
-        return res.status(500).json({ error: 'GitHub Token not configured on server' });
+        return res.status(500).json({ error: 'GitHub Token not configured' });
     }
 
-    try {
-        const response = await fetch(
-            `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WORKFLOW_ID}/dispatches`,
-            {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${GH_TOKEN}`,
-                    'Accept': 'application/vnd.github+json',
-                    'X-GitHub-Api-Version': '2022-11-28',
-                },
-                body: JSON.stringify({
-                    ref: 'main', // Trigger the main branch
-                }),
+    const headers = {
+        'Authorization': `Bearer ${GH_TOKEN}`,
+        'Accept': 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+    };
+
+    // TRIGGER SCARPER (POST)
+    if (req.method === 'POST') {
+        try {
+            const response = await fetch(
+                `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WORKFLOW_ID}/dispatches`,
+                {
+                    method: 'POST',
+                    headers,
+                    body: JSON.stringify({ ref: 'main' }),
+                }
+            );
+
+            if (response.status === 204) {
+                return res.status(200).json({ message: 'Scraper triggered' });
             }
-        );
-
-        if (response.status === 204) {
-            return res.status(200).json({ message: 'Scraper triggered successfully!' });
-        } else {
             const errorData = await response.json();
-            return res.status(response.status).json({ error: errorData.message || 'Failed to trigger workflow' });
+            return res.status(response.status).json({ error: errorData.message });
+        } catch (error) {
+            return res.status(500).json({ error: 'Failed to trigger' });
         }
-    } catch (error) {
-        return res.status(500).json({ error: 'Internal server error' });
     }
+
+    // CHECK STATUS (GET)
+    if (req.method === 'GET') {
+        try {
+            const response = await fetch(
+                `https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/actions/workflows/${WORKFLOW_ID}/runs?per_page=1`,
+                { headers }
+            );
+            const data = await response.json();
+            const lastRun = data.workflow_runs?.[0];
+
+            if (!lastRun) {
+                return res.status(200).json({ status: 'unknown' });
+            }
+
+            return res.status(200).json({
+                status: lastRun.status, // in_progress, completed, queued
+                conclusion: lastRun.conclusion, // success, failure, cancelled
+                updated_at: lastRun.updated_at,
+                run_id: lastRun.id
+            });
+        } catch (error) {
+            return res.status(500).json({ error: 'Failed to fetch status' });
+        }
+    }
+
+    return res.status(405).json({ error: 'Method not allowed' });
 }

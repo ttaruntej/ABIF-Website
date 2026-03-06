@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './index.css';
 
-import { fetchOpportunities, triggerScraper } from './services/api';
+import { fetchOpportunities, triggerScraper, getScraperStatus } from './services/api';
 import { exportToCSV } from './utils/csvExporter';
 import { generateBriefing } from './utils/aiBriefing';
 import { SECTIONS, CATEGORIES } from './constants/tracker';
@@ -27,6 +27,9 @@ const Dashboard = () => {
     const [lastUpdated, setLastUpdated] = useState(
         `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
     );
+    const [serverStatus, setServerStatus] = useState(null); // 'in_progress', 'completed', etc.
+    const [syncStartTime, setSyncStartTime] = useState(null);
+    const [elapsedTime, setElapsedTime] = useState(0);
     const sectionRefs = useRef({});
 
     const loadData = () => {
@@ -70,18 +73,49 @@ const Dashboard = () => {
         return () => clearTimeout(timer);
     }, [isRefreshing, countdown, refreshSuccess]);
 
+    useEffect(() => {
+        let interval;
+        if (isRefreshing && !refreshSuccess) {
+            interval = setInterval(() => {
+                setElapsedTime(Math.floor((Date.now() - syncStartTime) / 1000));
+            }, 1000);
+        } else {
+            setElapsedTime(0);
+        }
+        return () => clearInterval(interval);
+    }, [isRefreshing, refreshSuccess, syncStartTime]);
+
     const handleRefresh = async () => {
+        if (isRefreshing) return;
+
         setIsRefreshing(true);
         setRefreshSuccess(false);
-        setCountdown(3);
+        setServerStatus('queued');
+        setSyncStartTime(Date.now());
 
         try {
-            // Trigger the real backend scraper via the proxy
             await triggerScraper();
-            console.log('Backend sync triggered successfully');
+
+            // Poll for real status
+            const pollInterval = setInterval(async () => {
+                try {
+                    const statusData = await getScraperStatus();
+                    setServerStatus(statusData.status);
+
+                    if (statusData.status === 'completed') {
+                        clearInterval(pollInterval);
+                        loadData();
+                    }
+                } catch (e) {
+                    console.error('Polling error:', e);
+                }
+            }, 5000);
+
+            setTimeout(() => clearInterval(pollInterval), 600000);
+
         } catch (err) {
             console.error('Trigger failed:', err.message);
-            // We don't block the UI refresh if the trigger fails (might be local dev)
+            setIsRefreshing(false);
         }
     };
 
@@ -160,15 +194,23 @@ const Dashboard = () => {
                                     <div className="flex items-center gap-4 text-slate-200">
                                         <div className="w-8 h-8 rounded-full border-2 border-slate-700 border-t-emerald-500 animate-spin"></div>
                                         <div className="flex-1">
-                                            <h3 className="font-bold text-sm m-0">Updating Dashboard...</h3>
-                                            <p className="text-xs text-slate-400 m-0">Fetching latest data</p>
+                                            <h3 className="font-bold text-sm m-0">
+                                                {serverStatus === 'in_progress' ? 'Scraping Live Data...' : 'Initializing Server...'}
+                                            </h3>
+                                            <p className="text-xs text-slate-400 m-0">
+                                                {serverStatus === 'in_progress'
+                                                    ? 'Reading BIRAC & DST Portals (~2-4 mins)'
+                                                    : 'Connecting to GitHub Infrastructure...'}
+                                            </p>
                                         </div>
-                                        <span className="font-black text-slate-500 text-lg">{countdown}s</span>
+                                        <span className="font-mono text-emerald-500 text-sm">
+                                            {elapsedTime}s
+                                        </span>
                                     </div>
-                                    <div className="h-1.5 bg-slate-700 rounded-full overflow-hidden">
+                                    <div className="h-1 bg-slate-700 rounded-full overflow-hidden">
                                         <div
-                                            className="h-full bg-gradient-to-r from-emerald-500 to-blue-500 transition-all duration-1000 ease-linear shadow-[0_0_10px_rgba(16,185,129,0.5)]"
-                                            style={{ width: `${((3 - countdown) / 3) * 100}%` }}
+                                            className={`h-full bg-gradient-to-r from-emerald-500 to-blue-500 transition-all duration-500 ease-out shadow-[0_0_10px_rgba(16,185,129,0.5)]`}
+                                            style={{ width: serverStatus === 'in_progress' ? '75%' : '25%' }}
                                         ></div>
                                     </div>
                                 </div>

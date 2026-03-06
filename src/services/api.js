@@ -7,9 +7,15 @@ export const fetchOpportunities = async () => {
 };
 
 export const triggerScraper = async () => {
-    // Note: This only works if hosted on a platform supporting /api routes (Vercel/Netlify)
     const res = await fetch('/api/trigger-sync', { method: 'POST' });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || 'Failed to trigger scraper');
     return data;
 };
+
+export const getScraperStatus = async () => {
+    const res = await fetch('/api/trigger-sync', { method: 'GET' });
+    if (!res.ok) throw new Error('Failed to fetch status');
+    return await res.json();
+};
+
