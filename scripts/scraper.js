@@ -990,8 +990,9 @@ async function sendIncubatorReport(data) {
 
     let htmlContent = `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; color: #333;">
-            <h2 style="color: #2563eb;">ABIF Incubator Funding Update</h2>
-            <p>Wait no more! Here are the active funding opportunities relevant to incubators/accelerators updated today by your automated scraper:</p>
+            <h2 style="color: #2563eb;">🤖 ABIF Core AI Agent Reporting...</h2>
+            <p>Good morning!</p>
+            <p>I have just completed my automated nightly deep-scan across the Indian funding ecosystem on behalf of <strong>Tarun Tej Thadana</strong>. Here are the active opportunities specifically relevant for incubators and accelerators today:</p>
             <hr style="border: 1px solid #e5e7eb; margin: 20px 0;" />
     `;
 
@@ -1010,7 +1011,8 @@ async function sendIncubatorReport(data) {
 
     htmlContent += `
             <hr style="border: 1px solid #e5e7eb; margin: 20px 0;" />
-            <p style="font-size: 12px; color: #94a3b8; text-align: center;">Automated by ABIF Funding Scraper &bull; <a href="https://github.com/ttaruntej/ABIF-Funding-Tracker" style="color: #94a3b8;">View Dashboard</a></p>
+            <p style="font-size: 13px; color: #475569; text-align: center;"><em>"Your silent, autonomous funding researcher."</em></p>
+            <p style="font-size: 12px; color: #94a3b8; text-align: center;">Operated by your ABIF AI Agent &bull; <a href="https://github.com/ttaruntej/ABIF-Funding-Tracker" style="color: #94a3b8;">View Dashboard</a></p>
         </div>
     `;
 
@@ -1019,7 +1021,7 @@ async function sendIncubatorReport(data) {
         const recipients = ABIF_TEAM_EMAIL.split(',').map(e => e.trim()).filter(e => e).join(', ');
 
         const info = await transporter.sendMail({
-            from: SMTP_FROM || '"Tarun Tej Thadana | ABIF IIT Kharagpur" <abif.tbimanager@gmail.com>',
+            from: SMTP_FROM || '"ABIF AI Agent" <abif.tbimanager@gmail.com>',
             to: recipients,
             subject: `🚀 [ABIF Alert] ${incubatorOpps.length} Active Incubator Grants & Funding Opportunities`,
             html: htmlContent,
