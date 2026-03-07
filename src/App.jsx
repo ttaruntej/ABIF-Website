@@ -46,6 +46,7 @@ const Dashboard = () => {
     const [activeCategory, setActiveCategory] = useState('all');
     const [activeSector, setActiveSector] = useState('All Sectors');
     const [searchQuery, setSearchQuery] = useState('');
+    const [emailNotification, setEmailNotification] = useState(null);
     const [currentView, setCurrentView] = useState('dashboard');
     const [lastUpdated, setLastUpdated] = useState(
         `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
@@ -131,10 +132,12 @@ const Dashboard = () => {
     const handleEmailTrigger = async (targetEmails) => {
         try {
             await triggerEmail(targetEmails);
-            alert("Email delivery triggered successfully! Please wait a few moments for it to arrive.");
+            setEmailNotification({ type: 'success', message: 'Intelligence briefing dispatched successfully!' });
+            setTimeout(() => setEmailNotification(null), 5000);
         } catch (err) {
             console.error('Email trigger failed:', err.message);
-            alert("Failed to trigger email. Check console for details.");
+            setEmailNotification({ type: 'error', message: 'Failed to dispatch email. Check connection.' });
+            setTimeout(() => setEmailNotification(null), 5000);
         }
     };
 
@@ -252,6 +255,25 @@ const Dashboard = () => {
                                     </div>
                                 </div>
                             )}
+                        </div>
+                    </div>
+                )}
+
+                {/* Email Notification Toast */}
+                {emailNotification && (
+                    <div className="fixed bottom-8 right-8 z-[100] animate-in slide-in-from-bottom-5 fade-in duration-300">
+                        <div className={`backdrop-blur-xl border shadow-2xl rounded-2xl p-4 flex items-center gap-4 w-[320px] bg-white/90 dark:bg-slate-800/90 ${emailNotification.type === 'success'
+                                ? 'border-emerald-500/50 text-emerald-600 dark:text-emerald-400'
+                                : 'border-red-500/50 text-red-600 dark:text-red-400'
+                            }`}>
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-lg 
+                                ${emailNotification.type === 'success' ? 'bg-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.3)] border border-emerald-500' : 'bg-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.3)] border border-red-500'}`}>
+                                {emailNotification.type === 'success' ? '✓' : '✗'}
+                            </div>
+                            <div>
+                                <h3 className="font-bold m-0 text-slate-800 dark:text-slate-100">{emailNotification.type === 'success' ? 'Dispatch Successful' : 'Dispatch Failed'}</h3>
+                                <p className="text-xs m-0 text-slate-500 dark:text-slate-400">{emailNotification.message}</p>
+                            </div>
                         </div>
                     </div>
                 )}
