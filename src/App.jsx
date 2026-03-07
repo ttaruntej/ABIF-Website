@@ -47,6 +47,12 @@ const Dashboard = () => {
     const [activeSector, setActiveSector] = useState('All Sectors');
     const [searchQuery, setSearchQuery] = useState('');
     const [emailNotification, setEmailNotification] = useState(null);
+    const [lastEmailDispatch, setLastEmailDispatch] = useState(() => {
+        if (typeof window !== 'undefined') {
+            return localStorage.getItem('lastEmailDispatch');
+        }
+        return null;
+    });
     const [currentView, setCurrentView] = useState('dashboard');
     const [lastUpdated, setLastUpdated] = useState(
         `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
@@ -170,11 +176,14 @@ const Dashboard = () => {
                         } else if (statusData.status === 'completed') {
                             clearInterval(pollInterval);
                             if (statusData.conclusion === 'success') {
+                                const now = `${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+                                setLastEmailDispatch(now);
+                                localStorage.setItem('lastEmailDispatch', now);
                                 setEmailNotification({ type: 'success', message: 'Intelligence briefing dispatched successfully!' });
                             } else {
                                 setEmailNotification({ type: 'error', message: `Dispatch failed: ${statusData.conclusion}` });
                             }
-                            setTimeout(() => setEmailNotification(null), 6000);
+                            setTimeout(() => setEmailNotification(null), 10000);
                         }
                     }
                 } catch (e) {
@@ -311,8 +320,8 @@ const Dashboard = () => {
                 {emailNotification && (
                     <div className="fixed bottom-8 right-8 z-[100] animate-in slide-in-from-bottom-5 fade-in duration-300">
                         <div className={`backdrop-blur-xl border shadow-2xl rounded-2xl p-4 flex items-center gap-4 w-[320px] bg-white/90 dark:bg-slate-800/90 ${emailNotification.type === 'success' ? 'border-emerald-500/50 text-emerald-600 dark:text-emerald-400'
-                                : emailNotification.type === 'error' ? 'border-red-500/50 text-red-600 dark:text-red-400'
-                                    : 'border-blue-500/50 text-blue-600 dark:text-blue-400'
+                            : emailNotification.type === 'error' ? 'border-red-500/50 text-red-600 dark:text-red-400'
+                                : 'border-blue-500/50 text-blue-600 dark:text-blue-400'
                             }`}>
                             <div className={`w-10 h-10 min-w-10 rounded-full flex items-center justify-center font-bold text-lg 
                                 ${emailNotification.type === 'success' ? 'bg-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.3)] border border-emerald-500'
@@ -342,8 +351,10 @@ const Dashboard = () => {
                     handleRefresh={handleRefresh}
                     isRefreshing={isRefreshing}
                     lastUpdated={lastUpdated}
+                    lastEmailDispatch={lastEmailDispatch}
                     theme={theme}
                     setTheme={setTheme}
+                    handleEmailTrigger={handleEmailTrigger}
                 />
 
                 {currentView === 'dashboard' ? (

@@ -9,6 +9,7 @@ const Header = ({
     handleEmailTrigger,
     isRefreshing,
     lastUpdated,
+    lastEmailDispatch,
     theme,
     setTheme
 }) => {
@@ -83,8 +84,17 @@ const Header = ({
                     </button>
                 </div>
 
-                <div className="text-xs text-slate-500 font-medium">
-                    Last Refreshed: {lastUpdated}
+                <div className="flex flex-col items-end text-[10px] text-slate-400 dark:text-slate-500 font-medium tracking-tight">
+                    <div className="flex items-center gap-1.5">
+                        <span className="w-1 h-1 rounded-full bg-blue-500"></span>
+                        Last Refreshed: {lastUpdated}
+                    </div>
+                    {lastEmailDispatch && (
+                        <div className="flex items-center gap-1.5 text-indigo-500 dark:text-indigo-400/80 mt-0.5 animate-in fade-in slide-in-from-right-2">
+                            <span className="w-1 h-1 rounded-full bg-indigo-500 animate-pulse"></span>
+                            Last Alert Dispatched: {lastEmailDispatch}
+                        </div>
+                    )}
                 </div>
             </div>
 
