@@ -25,7 +25,7 @@ const __dirname = path.dirname(__filename);
 const DATA_FILE = path.join(__dirname, '../public/data/opportunities.json');
 
 const genAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
-const MODEL_NAME = "gemini-1.5-pro"; // Upgraded for 2M context window
+const MODEL_NAME = "gemini-1.5-flash"; // Reverted for sanity check
 
 // --- CORE UTILS ---
 
@@ -35,7 +35,21 @@ async function randomDelay(min = 3000, max = 7000) {
 }
 
 /**
- * Intelligent AI Discovery (v2.0 - Pro Mode)
+ * Vector-lite Similarity Score (v2.1)
+ * Uses a simpler Jaccard-style intersection for high speed.
+ */
+function getSimilarityScore(str1, str2) {
+    const s1 = new Set(str1.toLowerCase().split(/\W+/).filter(w => w.length > 2));
+    const s2 = new Set(str2.toLowerCase().split(/\W+/).filter(w => w.length > 2));
+    if (s1.size === 0 || s2.size === 0) return 0;
+
+    const intersection = new Set([...s1].filter(x => s2.has(x)));
+    const union = new Set([...s1, ...s2]);
+    return intersection.size / union.size;
+}
+
+/**
+ * Intelligent AI Discovery (v2.1 - Pro Mode)
  */
 async function aiDetectOpportunities(page) {
     if (!genAI) return [];
@@ -51,7 +65,7 @@ async function aiDetectOpportunities(page) {
                 { category: "HARM_CATEGORY_DANGEROUS_CONTENT", threshold: "BLOCK_NONE" }
             ]
         });
-        const prompt = `You are the ABIF Funding Intelligence Agent. Analyze the following webpage text and extract all ACTIVE funding opportunities, grants, or schemes for Indian Startups or Incubators.
+        const prompt = `You are the ABIF Funding Intelligence Agent. Analyze the webpage text and extract all ACTIVE funding opportunities, grants, or schemes for Indian Startups or Incubators.
         
         Text: ${bodyText}
         
@@ -72,35 +86,40 @@ async function aiDetectOpportunities(page) {
         text = text.replace(/^```json\n?/, '').replace(/\n?```$/, '');
         return JSON.parse(text);
     } catch (e) {
-        console.error('    ❌ AI Detection/Validation failed:', e.message);
+        console.error('    ❌ AI Detection failed:', e.message);
         return [];
     }
 }
 
 /**
- * AI-Powered Fuzzy Deduplication
+ * AI Batch Deduplication (v2.1)
+ * Sends all candidates in ONE call to save tokens and quota.
  */
-async function aiIsDuplicate(candidateName, existingNames) {
-    if (!genAI || existingNames.length === 0) return false;
-
-    // Direct match check first
-    if (existingNames.some(name => name.toLowerCase() === candidateName.toLowerCase())) return true;
+async function aiBatchDeduplicate(candidates, existingMandates) {
+    if (!genAI || candidates.length === 0) return candidates;
 
     try {
         const model = genAI.getGenerativeModel({ model: MODEL_NAME });
-        const prompt = `Compare these funding scheme names. Do they refer to the SAME scheme?
+        const existingSummary = existingMandates.map(m => m.name).slice(-50); // Most recent 50
+
+        const prompt = `You are a data deduplication expert. Compare the "New Candidates" list against the "Existing Mandates" list. 
+        Determine which of the New Candidates are ALREADY present in the existing list (even if the naming is slightly different, e.g., "SIFS" vs "Startup India Seed Fund").
         
-        New Candidate: "${candidateName}"
-        Existing Schemes: ${JSON.stringify(existingNames.slice(-40))}
+        New Candidates: ${JSON.stringify(candidates.map(c => c.name))}
+        Existing Mandates: ${JSON.stringify(existingSummary)}
         
-        Respond ONLY with "YES" if it is a duplicate or very similar variant, "NO" otherwise.`;
+        Return a JSON object where keys are the Candidate Names and values are BOOLEAN (true if it's a duplicate, false if it is NEW).
+        Only return the JSON object.`;
 
         const result = await model.generateContent(prompt);
-        const response = result.response.text().trim().toUpperCase();
-        return response.includes('YES');
+        let text = result.response.text().trim();
+        text = text.replace(/^```json\n?/, '').replace(/\n?```$/, '');
+        const dupMap = JSON.parse(text);
+
+        return candidates.filter(c => !dupMap[c.name]);
     } catch (e) {
-        console.error('    ❌ Fuzzy Deduplication failed:', e.message);
-        return false;
+        console.error('    ❌ Batch Deduplication failed:', e.message);
+        return candidates; // Fallback: keep all to avoid missing data
     }
 }
 
@@ -158,6 +177,9 @@ async function deepScanStartupIndia(browser) {
                 s.dataSource = 'scraper:deep:ai';
             });
             allSchemes.push(...aiFound);
+
+
+
             await randomDelay();
         }
         return allSchemes;
@@ -172,7 +194,7 @@ async function deepScanStartupIndia(browser) {
 // --- MAIN ---
 
 async function main() {
-    console.log('\n🚀 Starting ABIF Deep Intelligence Scan (v2.0 - Pro Mode)...');
+    console.log('\n🚀 Starting ABIF Deep Intelligence Scan (v2.1 - Efficiency Mode)...');
     const browser = await puppeteer.launch({
         headless: "new",
         args: ['--no-sandbox', '--disable-setuid-sandbox']
@@ -185,36 +207,63 @@ async function main() {
         ]);
 
         const rawResults = [...birac, ...startupIndia];
-        console.log(`\n✅ Deep Scan complete. Found ${rawResults.length} candidates.`);
+        console.log(`\n✅ Deep Scan complete. Found ${rawResults.length} raw candidates.`);
 
         if (fs.existsSync(DATA_FILE)) {
             const existingData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
             const existingNames = existingData.map(d => d.name);
             const mergedData = [...existingData];
 
-            console.log('🧠 Running AI Fuzzy Deduplication & Metadata Enrichment...');
+            // --- STEP 1: VECTOR-LITE PRE-PASS ---
+            console.log('⚡ Running Vector-lite Pre-pass (Similarity Check)...');
+
+
+            const uniqueCandidates = [];
             for (const item of rawResults) {
-                // Skip if exact name exists
-                if (existingNames.includes(item.name)) {
-                    const idx = mergedData.findIndex(d => d.name === item.name);
-                    mergedData[idx] = { ...mergedData[idx], ...item, lastScanned: new Date().toISOString() };
+                // Exact match check (case-insensitive)
+                const isExactDup = existingNames.some(ext => ext.toLowerCase() === item.name.toLowerCase());
+                if (isExactDup) {
+                    console.log(`   ⏩ Exact Skip: "${item.name}"`);
                     continue;
                 }
 
-                // Check for fuzzy duplicates (batching or individual as needed, here individual for Pro accuracy)
-                const isFuzzyDup = await aiIsDuplicate(item.name, existingNames);
-                if (isFuzzyDup) {
-                    console.log(`   ⏩ Fuzzy Skip: "${item.name}" (Duplicate of existing mandate)`);
+                // Similarity check (85% threshold for automated skip)
+                let maxSim = 0;
+                let bestMatch = '';
+                for (const ext of existingNames) {
+                    const sim = getSimilarityScore(item.name, ext);
+                    if (sim > maxSim) {
+                        maxSim = sim;
+                        bestMatch = ext;
+                    }
+                }
+
+                if (maxSim > 0.85) {
+                    console.log(`   ⏩ Vector Skip: "${item.name}" (High similarity ${Math.round(maxSim * 100)}% with "${bestMatch}")`);
                     continue;
                 }
 
-                console.log(`   ✨ New Discovery: "${item.name}"`);
-                mergedData.push({
-                    ...item,
-                    category: item.category || 'national',
-                    lastScanned: new Date().toISOString(),
-                    dataSource: item.dataSource || 'scraper:deep:ai'
-                });
+
+                uniqueCandidates.push(item);
+            }
+
+            // --- STEP 2: BATCH INTELLIGENCE ---
+            if (uniqueCandidates.length > 0) {
+                console.log(`🧠 Running AI Batch Deduplication on ${uniqueCandidates.length} potential mandates...`);
+                const finalDiscoveries = await aiBatchDeduplicate(uniqueCandidates, existingData);
+
+                // --- STEP 3: FINAL MERGE ---
+                for (const item of finalDiscoveries) {
+                    console.log(`   ✨ New Discovery Added: "${item.name}"`);
+                    mergedData.push({
+                        ...item,
+                        category: item.category || 'national',
+                        lastScanned: new Date().toISOString(),
+                        dataSource: item.dataSource || 'scraper:deep:batch'
+                    });
+                }
+            } else {
+                console.log('    ℹ️ No new candidates passed the similarity pre-filter.');
             }
 
             fs.writeFileSync(DATA_FILE, JSON.stringify(mergedData, null, 4));
