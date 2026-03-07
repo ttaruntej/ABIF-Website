@@ -133,7 +133,10 @@ async function generatePreview() {
     
     <!-- Footer -->
     <div style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
-        <p style="font-size: 12px; color: #94a3b8; margin: 0; padding-top: 20px;">Sent securely via ABIF AI Agent System</p>
+        <p style="font-size: 15px; color: #334155; margin: 0 0 15px 0; font-weight: 500;">Ready to scan the full ecosystem?</p>
+        <a href="https://ttaruntej.github.io/ABIF-Funding-Tracker/" style="display: inline-block; border: 2px solid #cbd5e1; color: #475569; text-decoration: none; font-weight: 600; font-size: 14px; padding: 10px 24px; border-radius: 8px; margin-bottom: 24px;">Access Deal Flow Radar</a>
+        
+        <p style="font-size: 12px; color: #94a3b8; margin: 0; padding-top: 20px; border-top: 1px dashed #cbd5e1;">Sent securely via ABIF AI Agent System</p>
     </div>
 </div>`;
 

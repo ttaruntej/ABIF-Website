@@ -203,7 +203,7 @@ async function sendEmail() {
         const info = await transporter.sendMail({
             from: SMTP_FROM || '"ABIF AI Agent" <abif.tbimanager@gmail.com>',
             to: recipients,
-            subject: `🚀 [ABIF Alert] ${incubatorOpps.length} Active Incubator Grants & Funding Opportunities`,
+            subject: aiSubject,
             html: htmlContent,
         });
         console.log(`  ✓ Email sent successfully to: ${recipients} (ID: ${info.messageId})`);

@@ -139,30 +139,42 @@ const Dashboard = () => {
     const handleEmailTrigger = async (targetEmails) => {
         try {
             // Start the dispatch process, notify user we are initializing
-            setEmailNotification({ type: 'initializing', message: 'Connecting to Vercel API...' });
+            setEmailNotification({ type: 'initializing', message: 'Connecting to Funding Radar Proxy...' });
 
-            // Get current run ID to have a baseline
-            let initialStatus;
+            // 1. Get current run ID to have a baseline
+            let baselineRunId;
             try {
-                initialStatus = await getEmailStatus();
+                const initialStatus = await getEmailStatus();
+                baselineRunId = initialStatus?.run_id;
             } catch (e) {
                 console.warn("Could not fetch initial baseline status, proceeding anyway.");
             }
-            const baselineRunId = initialStatus?.run_id;
 
-            // Trigger the email
-            await triggerEmail(targetEmails);
-            setEmailNotification({ type: 'in_progress', message: 'Initiating secure data sync... (~10s)' });
+            // 2. Trigger the email - with a "Fire and Check" strategy
+            let triggerErrored = false;
+            try {
+                await triggerEmail(targetEmails);
+                setEmailNotification({ type: 'in_progress', message: 'Dispatching intelligence briefing...' });
+            } catch (err) {
+                console.warn('Trigger request timed out or failed, but checking for background success...', err.message);
+                triggerErrored = true;
+                // We don't exit here! We proceed to poll to see if it worked anyway.
+            }
 
-            // Start polling for status
+            // 3. Start polling for status (2 minutes total)
             let attempts = 0;
-            const maxAttempts = 24; // 2 minutes total (24 * 5s)
+            const maxAttempts = 24;
 
             const pollInterval = setInterval(async () => {
                 attempts++;
+
                 if (attempts >= maxAttempts) {
                     clearInterval(pollInterval);
-                    setEmailNotification({ type: 'error', message: 'Dispatch timed out. Please check logs.' });
+                    if (triggerErrored) {
+                        setEmailNotification({ type: 'error', message: 'Connection lost. Please check your inbox manually.' });
+                    } else {
+                        setEmailNotification({ type: 'error', message: 'Dispatch status unconfirmed. Check logs.' });
+                    }
                     setTimeout(() => setEmailNotification(null), 7000);
                     return;
                 }
@@ -170,10 +182,12 @@ const Dashboard = () => {
                 try {
                     const statusData = await getEmailStatus();
 
-                    // Wait for a NEW run to appear or if the status becomes in_progress
+                    // If we found a NEW run_id, then we KNOW it was triggered
                     if (statusData.run_id && statusData.run_id !== baselineRunId) {
-                        if (statusData.status === 'in_progress') {
-                            setEmailNotification({ type: 'in_progress', message: 'Dispatching intelligence briefing...' });
+                        triggerErrored = false; // Reset error if we see proof of life
+
+                        if (statusData.status === 'in_progress' || statusData.status === 'queued') {
+                            setEmailNotification({ type: 'in_progress', message: 'Intelligence briefing being synthesized...' });
                         } else if (statusData.status === 'completed') {
                             clearInterval(pollInterval);
                             if (statusData.conclusion === 'success') {
@@ -182,19 +196,24 @@ const Dashboard = () => {
                                 localStorage.setItem('lastEmailDispatch', now);
                                 setEmailNotification({ type: 'success', message: 'Intelligence briefing dispatched successfully!' });
                             } else {
-                                setEmailNotification({ type: 'error', message: `Dispatch failed: ${statusData.conclusion}` });
+                                setEmailNotification({ type: 'error', message: `Dispatch failed on server: ${statusData.conclusion}` });
                             }
                             setTimeout(() => setEmailNotification(null), 10000);
                         }
+                    } else if (triggerErrored && attempts > 4) {
+                        // If trigger failed and after 20s still no new run, THEN we call it a failure
+                        clearInterval(pollInterval);
+                        setEmailNotification({ type: 'error', message: 'Failed to trigger dispatch. Check connection.' });
+                        setTimeout(() => setEmailNotification(null), 6000);
                     }
                 } catch (e) {
-                    console.error('Email status polling error:', e);
+                    console.warn('Email status polling tick error:', e.message);
                 }
             }, 5000);
 
         } catch (err) {
-            console.error('Email trigger failed:', err.message);
-            setEmailNotification({ type: 'error', message: 'Failed to trigger email. Check connection.' });
+            console.error('Critical Email Trigger Error:', err);
+            setEmailNotification({ type: 'error', message: 'System Error. Check browser console.' });
             setTimeout(() => setEmailNotification(null), 5000);
         }
     };
