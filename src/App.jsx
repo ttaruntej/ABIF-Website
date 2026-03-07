@@ -18,10 +18,9 @@ const Dashboard = () => {
         if (typeof window !== 'undefined') {
             const stored = localStorage.getItem('theme');
             if (stored) return stored;
-            if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
-            return 'light'; // Fallback / Default
+            return 'light'; // Default
         }
-        return 'dark'; // Initial SSR
+        return 'light'; // Initial SSR
     });
 
     useEffect(() => {
