@@ -10,6 +10,7 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const DATA_FILE = path.join(process.cwd(), 'public', 'data', 'opportunities.json');
+const HISTORY_FILE = path.join(process.cwd(), 'public', 'data', 'last_email_sent.json');
 
 async function sendEmail() {
     const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM, ABIF_TEAM_EMAIL, TARGET_EMAILS, GEMINI_API_KEY } = process.env;
@@ -28,9 +29,8 @@ async function sendEmail() {
         process.exit(1);
     }
 
-    const data = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-
-    const incubatorOpps = data.filter(x =>
+    const currentData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
+    const incubatorOpps = currentData.filter(x =>
         x.targetAudience && x.targetAudience.includes('incubator') && x.status !== 'Closed'
     );
 
@@ -38,6 +38,21 @@ async function sendEmail() {
         console.log('  ℹ No active incubator opportunities to email today.');
         process.exit(0);
     }
+
+    // --- HISTORY TRACKING & DELTA ---
+    let historyOpps = [];
+    if (fs.existsSync(HISTORY_FILE)) {
+        try {
+            historyOpps = JSON.parse(fs.readFileSync(HISTORY_FILE, 'utf8'));
+        } catch (e) {
+            console.warn('  ⚠ Could not read history file. Treating as first run.');
+        }
+    }
+
+    const newItems = incubatorOpps.filter(curr => !historyOpps.some(hist => hist.name === curr.name));
+    const closedItems = historyOpps.filter(hist => !currentData.some(curr => curr.name === hist.name && curr.status !== 'Closed'));
+
+    console.log(`\n─── Delta Analysis: ${newItems.length} New, ${closedItems.length} Closed ───`);
 
     console.log(`\n─── Preparing Email for ${incubatorOpps.length} Incubator Opportunities ───`);
 
@@ -52,23 +67,42 @@ async function sendEmail() {
     });
 
     // --- AI GENERATION ---
-    let aiIntro = `<p style="font-size: 16px; line-height: 1.6; color: #475569; margin-bottom: 24px;">I have compiled my latest deep-scan across the Indian funding ecosystem. Here are the active mandates specifically relevant for your portfolio startups and incubator initiatives today:</p>`;
+    let aiIntro = `<p style="font-size: 16px; line-height: 1.6; color: #475569; margin-bottom: 24px;">Greetings! I am the <strong>AI Agent of Tarun Tej Thadana (TBI Manager, ABIF)</strong>. I have compiled the latest deep-scan across the Indian funding ecosystem for you. Here are the active mandates relevant for our incubator and portfolio initiatives:</p>`;
+    let aiSubject = `📡 [ABIF Intelligence] ${newItems.length > 0 ? `NEW: ${newItems[0].name.slice(0, 20)}... + ` : ''}${incubatorOpps.length} Mandates for Tarun Tej`;
 
     if (GEMINI_API_KEY) {
         try {
-            console.log('  🧠 Generating AI Briefing for email intro...');
+            console.log('  🧠 Generating AI Briefing & Subject Line...');
             const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
-            const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
-            const prompt = `You are the ABIF Funding Intelligence Agent. Write a short, genuine, and encouraging 2-sentence email introduction addressed to Indian Incubator and Accelerator Managers. 
-            Summarize the state of these active funding opportunities: ${JSON.stringify(incubatorOpps.map(o => o.name))}. 
-            Make it sound professional, premium, and highlight the value of acting on these grants. Do not use generic greetings like "Dear XYZ". Start directly with the insight.`;
+            const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+            const prompt = `You are the personalized AI Agent of Tarun Tej Thadana, TBI Manager of ABIF IIT Kharagpur. 
+            Greeting Requirements:
+            1. Introduce yourself as Tarun's AI Agent.
+            2. Share some relevant latest catchy info or insight about the Indian AgriTech/Incubator ecosystem.
+            3. Summarize the changes: ${newItems.length} new opportunities found, ${closedItems.length} items recently closed/removed.
+            4. Current opportunities: ${JSON.stringify(incubatorOpps.map(o => o.name))}.
+            
+            Format your response as a JSON object:
+            {
+              "subject": "A catchy, short, urgent subject line reflecting the updates",
+              "intro": "The professional intro text (HTML allowed for breaks, 3-4 sentences)"
+            }
+            
+            Tone: Professional, premium, insight-driven, and slightly urgent. Do not use generic greetings like "Dear Managers".`;
 
             const result = await model.generateContent(prompt);
-            const text = result.response.text().replace(/\n/g, '<br/>');
-            aiIntro = `<p style="font-size: 16px; line-height: 1.6; color: #334155; margin-bottom: 24px; font-weight: 500;">${text}</p>`;
-            console.log('  ✓ AI Briefing generated successfully.');
+            const responseText = result.response.text();
+            // Basic JSON cleaning in case of markdown blocks
+            const cleanJson = responseText.replace(/```json/g, '').replace(/```/g, '').trim();
+            const aiData = JSON.parse(cleanJson);
+
+            aiSubject = aiData.subject;
+            aiIntro = `<div style="font-size: 16px; line-height: 1.6; color: #334155; margin-bottom: 24px; font-weight: 500;">${aiData.intro}</div>`;
+
+            console.log('  ✓ AI generation successful.');
         } catch (e) {
-            console.warn('  ⚠ Failed to generate AI intro. Falling back to default text.', e.message);
+            console.warn('  ⚠ AI generation failed. Falling back to default.', e.message);
         }
     }
 
@@ -90,6 +124,29 @@ async function sendEmail() {
                 </div>
                 
                 ${aiIntro}
+
+                <!-- Delta Highlights -->
+                ${newItems.length > 0 || closedItems.length > 0 ? `
+                <div style="background-color: #f1f5f9; border-radius: 12px; padding: 20px; margin-bottom: 30px; border: 1px dashed #cbd5e1;">
+                    <h4 style="margin: 0 0 12px 0; color: #1e293b; font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Intelligence Delta Analysis</h4>
+                    ${newItems.length > 0 ? `
+                        <div style="margin-bottom: 10px;">
+                            <span style="color: #059669; font-weight: 700; font-size: 13px;">🆕 NEW DISCOVERIES:</span>
+                            <ul style="margin: 5px 0 0 0; padding-left: 20px; color: #475569; font-size: 13px;">
+                                ${newItems.map(item => `<li>${item.name}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                    ${closedItems.length > 0 ? `
+                        <div>
+                            <span style="color: #dc2626; font-weight: 700; font-size: 13px;">⚠️ RECENTLY CLOSED:</span>
+                            <ul style="margin: 5px 0 0 0; padding-left: 20px; color: #475569; font-size: 13px;">
+                                ${closedItems.map(item => `<li>${item.name}</li>`).join('')}
+                            </ul>
+                        </div>
+                    ` : ''}
+                </div>
+                ` : ''}
 
                 <div style="height: 1px; background-color: #e2e8f0; margin: 30px 0;"></div>
     `;
@@ -150,6 +207,11 @@ async function sendEmail() {
             html: htmlContent,
         });
         console.log(`  ✓ Email sent successfully to: ${recipients} (ID: ${info.messageId})`);
+
+        // --- PERSISTENCE: Save current batch to history ---
+        fs.writeFileSync(HISTORY_FILE, JSON.stringify(incubatorOpps, null, 2));
+        console.log('  ✓ History updated for next dispatch.');
+
     } catch (error) {
         console.error('  ✗ Error sending email:', error);
         process.exit(1);
