@@ -1,31 +1,25 @@
 {
   "title": "ABIF Strategic Funding Analysis 2026",
-  "generatedAt": "2024-07-30T21:17:00Z",
-  "executiveSummary": "The current funding landscape for Indian startups is robust and diverse, characterized by strong national government backing, significant international collaboration, and a growing emphasis on social impact through CSR initiatives. Founders can access substantial capital, especially in emerging sectors like Agri-tech, Deeptech, AI, and Biotechnology, with many opportunities available on a rolling basis, ensuring continuous access to support.",
+  "generatedAt": "2026-03-07T21:43:46.295Z",
+  "executiveSummary": "As of Mar 7, 2026, the Indian funding ecosystem shows a robust activity level with 65 active programs identified. There is a significant tactical focus on Incubator / Scaling, which accounts for 32% of current open calls. ",
   "keyTrends": [
     {
-      "trend": "Robust Government & Institutional Backing",
-      "detail": "Providers like DST, BIRAC, MeitY, and SIDBI remain pivotal, offering comprehensive support from seed to scale. DST's NIDHI programs (NIDHI-iTBI, NIDHI-TBI, NIDHI-EIR) provide consistent incubation and early-stage capital. BIRAC strongly supports biotech and assistive tech (BIRAC BioNEST, Social Alpha Assistive Tech Quest, Bio AI call), while MeitY's TIDE 2.0 and STPI NGIS focus on IT and electronics. SIDBI offers significant financial schemes (SRIJAN, SMILE) for tech innovation and MSME growth, signaling a sustained government commitment to fostering a vibrant startup ecosystem."
+      "trend": "Sectoral Dominance",
+      "detail": "Incubator / Scaling remains a primary driver of new capital calls in this current cycle."
     },
     {
-      "trend": "Strategic Focus on DeepTech, AI, Biotech & Agri-Tech",
-      "detail": "There's a concentrated drive towards advanced technological sectors. AI and Deeptech are highlighted by programs like the India-France AI Call, DBT-BIRAC Joint Call on ‘Bio AI’, and Karnataka Elevate NXT. Biotechnology receives continuous support from BIRAC. Agri-tech, in particular, is a dominant sector, with dedicated funds from NABARD (AgriSURE), RKVY-RAFTAAR, MANAGE, and CSR initiatives like the India Agritech Incubation Network (BMGF) and Krishi Mangal (Cisco CSR), indicating high strategic priority and investment potential."
+      "trend": "Capital Concentration",
+      "detail": "37 premium programs are currently active in the high-impact (₹50L - ₹5Cr) tier."
     },
     {
-      "trend": "Global Collaboration & Impact-Driven Funding",
-      "detail": "International funding remains a strong avenue, often tied to global challenges and collaborative innovation. Opportunities from UNDP (Youth Co:Lab), UNIDO (Global Cleantech), GIZ–FCDO StartUpWave, and major foundations like Rockefeller, Ford, and Skoll provide access to international capital and networks. Concurrently, CSR funds from Tata Trusts, Social Alpha, Cisco CSR, and SBI Foundation actively seek ventures with significant social or environmental impact, emphasizing solutions for underserved communities and sustainable development goals."
-    },
-    {
-      "trend": "Continuous Incubation and Seed-Stage Support",
-      "detail": "A significant number of programs, including Startup India SISFS (both entries), NIDHI-EIR, BIRAC BioNEST, and various MSME Incubation Schemes, offer rolling applications. This ensures continuous access to seed grants, incubation support, and mentorship, crucial for early-stage ventures. The prevalence of these rolling mechanisms suggests a proactive approach by funding bodies to ensure startups can seek capital as their needs arise, rather than being restricted by fixed annual cycles."
+      "trend": "Strategic Shifts",
+      "detail": "Expansion noted in central government calls (BIRAC/DST) for deep-science R&D."
     }
   ],
   "actionableRecommendations": [
-    "Prioritize and Act on Rolling & Open Calls: Immediately assess and apply to programs with 'Rolling' or 'Open' statuses, such as NIDHI-EIR, Startup India SISFS, BIRAC BioNEST, and SIDBI's SRIJAN/SMILE, to secure continuous access to capital and support.",
-    "Align Solutions with Strategic Sector Focus: Deeply research and tailor applications for funding opportunities in high-priority sectors like Agri-tech, AI, Deeptech, and Biotechnology, which receive substantial and dedicated support from national and international providers.",
-    "Explore Hybrid Funding Strategies: Combine national grants and incubation support with international grants or CSR funds, especially for ventures demonstrating strong social or environmental impact, to diversify funding sources and leverage global networks.",
-    "Engage with the Incubator Ecosystem: Actively partner with Technology Business Incubators (TBIs), Atal Incubation Centres (AICs), and BioNESTs, as many government schemes (e.g., NIDHI, RKVY-RAFTAAR, MeitY TIDE 2.0) channel support through these entities, offering critical mentorship, infrastructure, and access to funding.",
-    "Proactively Verify and Prepare for Deadlines: Meticulously verify details and prepare applications for programs marked 'Verify Manually' or 'TBA,' and strategically plan for upcoming fixed deadlines, particularly for high-value national (e.g., DBT-BIRAC Bio AI, Karnataka Elevate NXT) and international competitive grants."
+    "Begin drafting concept notes for the upcoming summer Q2 funding cycles.",
+    "Review SMILE and SIDBI eligibility for high-value soft loan scaling.",
+    "Conduct technical readiness audits (TRL 4-7) for impending deep-tech calls."
   ],
-  "briefingFooter": "Synthesized by ABIF Neural Engine (Powered by Gemini 2.5 Flash) • Verified 09:17 PM"
+  "briefingFooter": "Synthesized by ABIF Research Engine v2.1 • Logic Fallback Mode • Verified 09:43 PM"
 }
