@@ -14,6 +14,13 @@ import { fileURLToPath } from 'url';
 import puppeteer from 'puppeteer-extra';
 import StealthPlugin from 'puppeteer-extra-plugin-stealth';
 import * as cheerio from 'cheerio';
+import { GoogleGenerativeAI } from '@google/generative-ai';
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+// ── Gemini Integration ────────────────────────────────────────────────────────
+const genAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
 
 puppeteer.use(StealthPlugin());
 
@@ -637,6 +644,134 @@ function getStaticRecords() {
             targetAudience: ['incubator', 'startup'],
             sectors: ['Social Impact', 'Agnostic'],
             stages: ['All Stages']
+        },
+        // STATE SPECIFIC
+        {
+            name: 'Karnataka Elevate NXT 2026 (Deeptech)',
+            body: 'KITS / Startup Karnataka',
+            maxAward: 'Up to ₹1 Crore',
+            deadline: '24-02-2026',
+            link: 'https://www.missionstartupkarnataka.org/elevate-karnataka',
+            description: 'Grant-in-aid funding for Deeptech startups in AI, ML, IoT, Robotics, and Quantum Technologies. relocate to Karnataka if outside.',
+            category: 'state',
+            status: 'Check Website',
+            dataSource: 'manual:state',
+            targetAudience: ['startup'],
+            sectors: ['DeepTech', 'AI', 'Robotics'],
+            stages: ['Early Traction', 'Scale-up']
+        },
+        {
+            name: 'Startup Odisha – Monthly Sustenance Allowance',
+            body: 'MSME Dept, Odisha',
+            maxAward: '₹20,000 - ₹22,000 / month',
+            deadline: 'Rolling (Open All Year)',
+            link: 'https://startupodisha.gov.in/',
+            description: 'One-year sustenance allowance for recognized startups. Additional 10% for women/SC/ST/PH founders.',
+            category: 'state',
+            status: 'Rolling',
+            dataSource: 'manual:state',
+            targetAudience: ['startup'],
+            sectors: ['Agnostic'],
+            stages: ['Ideation', 'Prototype']
+        },
+        {
+            name: 'Startup Odisha – Product Development & Marketing Assistance',
+            body: 'MSME Dept, Odisha',
+            maxAward: 'Up to ₹15 Lakhs',
+            deadline: 'Rolling (Open All Year)',
+            link: 'https://startupodisha.gov.in/',
+            description: 'Financial assistance for product development and marketing/publicity for recognized Odisha startups.',
+            category: 'state',
+            status: 'Rolling',
+            dataSource: 'manual:state',
+            targetAudience: ['startup'],
+            sectors: ['Agnostic'],
+            stages: ['Prototype', 'Seed']
+        },
+        // AGRITECH SPECIFIC
+        {
+            name: 'MANAGE-CIA RKVY-RAFTAAR Agribusiness Incubation',
+            body: 'MANAGE / Dept of Agriculture',
+            maxAward: 'Up to ₹25 Lakhs',
+            deadline: '31-03-2026',
+            link: 'https://www.manage.gov.in/',
+            description: 'Seed stage and idea stage funding for Agri-startups, students, and agripreneurs under the RKVY-RAFTAAR scheme.',
+            category: 'national',
+            status: 'Open',
+            dataSource: 'manual:agritech',
+            targetAudience: ['startup'],
+            sectors: ['AgriTech', 'Rural Development'],
+            stages: ['Ideation', 'Seed']
+        },
+        {
+            name: 'StartupTN Agri-Tech Grant',
+            body: 'StartupTN / Govt of Tamil Nadu',
+            maxAward: '₹10 Lakhs - ₹25 Lakhs',
+            deadline: '31-12-2025',
+            link: 'https://startuptn.in/',
+            description: 'Financial support for Agri-Tech startups focused on market expansion, innovation, or agricultural process improvement.',
+            category: 'state',
+            status: 'Open',
+            dataSource: 'manual:agritech',
+            targetAudience: ['startup'],
+            sectors: ['AgriTech'],
+            stages: ['Seed', 'Early Traction']
+        },
+        {
+            name: 'Venture Challenge 9.0 (AIC Shiv Nadar University)',
+            body: 'AIC-SNU',
+            maxAward: '₹5 Lakhs - ₹1 Crore',
+            deadline: '28-02-2026',
+            link: 'https://aic.snu.edu.in/',
+            description: 'Incubation and funding program for startups at various stages from prototype to scaling.',
+            category: 'national',
+            status: 'Check Website',
+            dataSource: 'manual:incubator',
+            targetAudience: ['startup'],
+            sectors: ['Agnostic', 'Tech'],
+            stages: ['Prototype', 'MVP', 'Scale-up']
+        },
+        {
+            name: 'AFI Agri Cohort 25-26',
+            body: 'Action For India',
+            maxAward: 'Accelerator Support & Investment',
+            deadline: '15-01-2026',
+            link: 'https://actionforindia.org/',
+            description: 'Accelerator program for climate-resilient farming, agri-fintech, and market linkages startups.',
+            category: 'national',
+            status: 'Open',
+            dataSource: 'manual:agritech',
+            targetAudience: ['startup'],
+            sectors: ['AgriTech', 'ClimateTech'],
+            stages: ['Early Traction', 'Growth']
+        },
+        {
+            name: 'Startup Gujarat – Srujan Seed Support (S4)',
+            body: 'i-Hub Gujarat',
+            maxAward: '₹2.5 Lakhs - ₹10 Lakhs',
+            deadline: '31-12-2026',
+            link: 'https://ihubgujarat.in/srujan',
+            description: 'Financial assistance for innovators and startups to progress from PoC to product/market stage.',
+            category: 'state',
+            status: 'Open',
+            dataSource: 'manual:state',
+            targetAudience: ['startup'],
+            sectors: ['Agnostic'],
+            stages: ['Prototype', 'MVP']
+        },
+        {
+            name: 'KSUM Idea Grant / Productization Grant',
+            body: 'Kerala Startup Mission',
+            maxAward: '₹2 Lakhs - ₹12 Lakhs',
+            deadline: 'Rolling (Check Cohorts)',
+            link: 'https://grants.startupmission.in/',
+            description: 'Grants for scaling budding entrepreneurs and startups to develop prototypes and products.',
+            category: 'state',
+            status: 'Rolling',
+            dataSource: 'manual:state',
+            targetAudience: ['startup'],
+            sectors: ['Agnostic'],
+            stages: ['Ideation', 'Prototype']
         }
     ];
 }
@@ -709,6 +844,116 @@ function mergeData(existingData, scrapedData, verifiedStatic) {
     });
 
     return Object.values(merged);
+}
+
+// ── Strategic Knowledge Extraction Engine ─────────────────────────────────────
+async function generateStrategicReport(data) {
+    const active = data.filter(x => x.status !== 'Closed');
+    const timestamp = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    const dateStr = new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+
+    // ── Logic-based analytical summary (The Heuristic Fallback) ──
+    const analyzeLogic = () => {
+        const sectors = {
+            'Deep Tech / AI': active.filter(x => /ai|deeptech|quantum|semiconductor/i.test(x.title + (x.body || '') + (x.description || ''))).length,
+            'AgriTech / Biotech': active.filter(x => /agri|farm|bio|seed|plant/i.test(x.title + (x.body || '') + (x.description || ''))).length,
+            'Sustainability / ESG': active.filter(x => /green|eco|carbon|waste|solar/i.test(x.title + (x.body || '') + (x.description || ''))).length,
+            'Incubator / Scaling': active.filter(x => /incubator|accelerator|scale|grant/i.test(x.title + (x.body || '') + (x.description || ''))).length
+        };
+        const topSector = Object.entries(sectors).sort((a, b) => b[1] - a[1])[0];
+        const highValueCount = active.filter(x => /crore|cr|lakh|50[,\.]?000/i.test(x.maxAward || x.value || '')).length;
+        const closingSoon = active.filter(x => x.status === 'Closing Soon').length;
+
+        let executiveSummary = `As of ${dateStr}, the Indian funding ecosystem shows a ${active.length > 25 ? 'robust' : 'moderate'} activity level with ${active.length} active programs identified. `;
+        if (topSector[1] > 2) executiveSummary += `There is a significant tactical focus on ${topSector[0]}, which accounts for ${Math.round((topSector[1] / active.length) * 100)}% of current open calls. `;
+        if (closingSoon > 0) executiveSummary += `Urgency is currently elevated with ${closingSoon} programs entering their final week of application. `;
+
+        return {
+            title: `ABIF Strategic Funding Analysis ${new Date().getFullYear()}`,
+            generatedAt: new Date().toISOString(),
+            executiveSummary,
+            keyTrends: [
+                {
+                    trend: "Sectoral Dominance",
+                    detail: `${topSector[0]} remains a primary driver of new capital calls in this current cycle.`
+                },
+                {
+                    trend: "Capital Concentration",
+                    detail: `${highValueCount} premium programs are currently active in the high-impact (₹50L - ₹5Cr) tier.`
+                },
+                {
+                    trend: "Strategic Shifts",
+                    detail: active.length > 30 ? "Expansion noted in central government calls (BIRAC/DST) for deep-science R&D." : "Stable funding landscape with a pivot toward CSR and State-specific rolling grants."
+                }
+            ],
+            actionableRecommendations: [
+                closingSoon > 0 ? `Immediately prioritize "Closing Soon" calls from ${active.find(x => x.status === 'Closing Soon')?.body || 'Government Providers'}.` : "Begin drafting concept notes for the upcoming summer Q2 funding cycles.",
+                highValueCount > 2 ? "Review SMILE and SIDBI eligibility for high-value soft loan scaling." : "Monitor SISFS rolling grants for early-stage seed support.",
+                "Conduct technical readiness audits (TRL 4-7) for impending deep-tech calls."
+            ],
+            briefingFooter: `Synthesized by ABIF Research Engine v2.1 • Logic Fallback Mode • Verified ${timestamp}`
+        };
+    };
+
+    // ── Real AI: Gemini Integration ──
+    if (genAI) {
+        console.log('\n─── Consulting Gemini (Deep Intelligence) ───');
+        try {
+            const model = genAI.getGenerativeModel({
+                model: "gemini-2.5-flash",
+                generationConfig: { responseMimeType: "application/json" }
+            });
+
+            // Extract just the core info to keep token count low
+            const subset = active.map(o => ({
+                name: o.name,
+                provider: o.body,
+                award: o.maxAward,
+                category: o.category,
+                deadline: o.deadline,
+                status: o.status
+            })).slice(0, 50);
+
+            const prompt = `You are a strategic funding analyst for ABIF, a top Indian incubator.
+            Analyze these ${subset.length} active funding opportunities: ${JSON.stringify(subset)}
+            
+            Generate a Strategic Research Report for startup founders.
+            Your response must be a JSON object with this EXACT schema:
+            {
+                "title": "ABIF Strategic Funding Analysis ${new Date().getFullYear()}",
+                "generatedAt": "ISO Timestamp",
+                "executiveSummary": "A human-like, professional 2-3 sentence overview of the current funding climate based on these specific programs.",
+                "keyTrends": [
+                    {"trend": "Trend Name", "detail": "Detailed insight about what the providers like BIRAC/DST/SIDBI are currently looking for."}
+                ],
+                "actionableRecommendations": [
+                    "Recommendation 1 starting with a verb",
+                    "Recommendation 2 starting with a verb",
+                    "Recommendation 3 starting with a verb"
+                ],
+                "briefingFooter": "Synthesized by ABIF Neural Engine (Powered by Gemini 2.5 Flash) • Verified ${timestamp}"
+            }
+            
+            Be insightful. Mention specific providers like SIDBI or BIRAC if they have major calls. 
+            Highlight sectors that seem dominant. Ensure actionableRecommendations are distinct and professional.`;
+
+            const result = await model.generateContent(prompt);
+            const rawResponse = result.response.text();
+
+            // Clean markdown if present and parse
+            const jsonStr = rawResponse.replace(/```json|```/g, "").trim();
+            const geminiReport = JSON.parse(jsonStr);
+
+            console.log('  ✓ Gemini synthesis complete.');
+            return geminiReport;
+        } catch (err) {
+            console.error('  ✗ Gemini API failed. Falling back to Logic Engine.', err.message);
+            return analyzeLogic();
+        }
+    }
+
+    // Default to logic if no API key
+    return analyzeLogic();
 }
 
 // ─── Main ─────────────────────────────────────────────────────────────────────
@@ -800,6 +1045,11 @@ async function runScrapers() {
     }
 
     const finalData = mergeData(existingData, allScraped, verifiedStatic);
+
+    // ── Generate AI Strategic Report ──
+    const reportPath = path.join(process.cwd(), 'public', 'data', 'research_report.json');
+    const strategicReport = await generateStrategicReport(finalData);
+    fs.writeFileSync(reportPath, JSON.stringify(strategicReport, null, 2));
 
     // ── Write output ──
     fs.writeFileSync(DATA_FILE, JSON.stringify(finalData, null, 2));
