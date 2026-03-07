@@ -16,8 +16,8 @@ const CategoryNav = ({
     return (
         <nav className="sticky top-6 z-50 bg-slate-900/90 backdrop-blur-xl border border-slate-700/50 rounded-2xl p-4 md:p-5 mb-8 flex flex-col gap-4 shadow-2xl transition-all duration-500">
             {/* Search & Category Tabs */}
-            <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
-                <div className="flex flex-wrap gap-2.5">
+            <div className="flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center w-full">
+                <div className="flex overflow-x-auto custom-scrollbar w-full lg:w-auto pb-3 lg:pb-0 gap-2.5 pr-2">
                     {CATEGORIES.map(cat => {
                         const isActive = activeCategory === cat.key;
                         const activeStyle = CAT_STYLES[cat.key] || CAT_STYLES.all;
@@ -25,9 +25,9 @@ const CategoryNav = ({
                         return (
                             <button
                                 key={cat.key}
-                                className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all duration-300 ${isActive
+                                className={`flex-shrink-0 flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-medium transition-all duration-300 ${isActive
                                     ? activeStyle
-                                    : 'border-slate-700/50 bg-slate-800/30 text-slate-400 hover:border-slate-500 hover:text-slate-200 hover:bg-slate-800/70 hover:-translate-y-0.5'
+                                    : 'border-slate-700/50 bg-slate-800/30 text-slate-400 hover:border-slate-500 hover:text-slate-200 hover:bg-slate-800/70'
                                     }`}
                                 onClick={() => setActiveCategory(cat.key)}
                             >
@@ -42,7 +42,7 @@ const CategoryNav = ({
                 </div>
 
                 {/* Search Bar */}
-                <div className="relative w-full lg:w-72 group">
+                <div className="relative w-full lg:w-80 flex-shrink-0 group">
                     <input
                         type="text"
                         placeholder="Search programs..."
@@ -65,9 +65,9 @@ const CategoryNav = ({
             </div>
 
             {/* Sector Filters */}
-            <div className="flex flex-wrap gap-2 pt-4 border-t border-slate-700/50 border-dashed">
+            <div className="flex overflow-x-auto custom-scrollbar gap-2 pt-4 pb-2 border-t border-slate-700/50 border-dashed w-full">
                 <button
-                    className={`px-3 py-1.5 rounded-lg border text-xs transition-all duration-300 ${activeSector === 'All Sectors'
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-lg border text-xs transition-all duration-300 ${activeSector === 'All Sectors'
                         ? 'bg-slate-700/50 text-slate-200 border-slate-500'
                         : 'bg-transparent border-slate-700/50 text-slate-400 hover:border-slate-500 hover:text-slate-200'
                         }`}
@@ -78,7 +78,7 @@ const CategoryNav = ({
                 {availableSectors.map(sec => (
                     <button
                         key={sec}
-                        className={`px-3 py-1.5 rounded-lg border text-xs transition-all duration-300 ${activeSector === sec
+                        className={`flex-shrink-0 px-3 py-1.5 rounded-lg border text-xs transition-all duration-300 ${activeSector === sec
                             ? 'bg-slate-700/50 text-slate-200 border-slate-500'
                             : 'bg-transparent border-slate-700/50 text-slate-400 hover:border-slate-500 hover:text-slate-200'
                             }`}
