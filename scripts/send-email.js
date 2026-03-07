@@ -192,7 +192,7 @@ async function sendEmail() {
                 <p style="font-size: 15px; color: #334155; margin: 0 0 15px 0; font-weight: 500;">Ready to scan the full ecosystem?</p>
                 <a href="https://ttaruntej.github.io/ABIF-Funding-Tracker/" style="display: inline-block; border: 2px solid #cbd5e1; color: #475569; text-decoration: none; font-weight: 600; font-size: 14px; padding: 10px 24px; border-radius: 8px; margin-bottom: 24px;">Access Deal Flow Radar</a>
                 
-                <p style="font-size: 12px; color: #94a3b8; margin: 0; padding-top: 20px; border-top: 1px dashed #cbd5e1;">Sent securely via ABIF AI Agent System &bull; <a href="https://github.com/ttaruntej/ABIF-Funding-Tracker" style="color: #94a3b8; text-decoration: underline;">GitHub</a></p>
+                <p style="font-size: 12px; color: #94a3b8; margin: 0; padding-top: 20px; border-top: 1px dashed #cbd5e1;">Sent securely via ABIF AI Agent System</p>
             </div>
         </div>
     `;

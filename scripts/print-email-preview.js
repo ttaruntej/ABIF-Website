@@ -133,7 +133,7 @@ async function generatePreview() {
     
     <!-- Footer -->
     <div style="background-color: #f8fafc; padding: 30px; text-align: center; border-top: 1px solid #e2e8f0;">
-        <p style="font-size: 12px; color: #94a3b8; margin: 0; padding-top: 20px;">Sent securely via ABIF AI Agent System &bull; <a href="https://github.com/ttaruntej/ABIF-Funding-Tracker" style="color: #94a3b8; text-decoration: underline;">GitHub</a></p>
+        <p style="font-size: 12px; color: #94a3b8; margin: 0; padding-top: 20px;">Sent securely via ABIF AI Agent System</p>
     </div>
 </div>`;
 
