@@ -13,6 +13,27 @@ import SchemeCard from './components/SchemeCard';
 import EmptyState from './components/EmptyState';
 
 const Dashboard = () => {
+    // Theme setup based on system preference or local storage
+    const [theme, setTheme] = useState(() => {
+        if (typeof window !== 'undefined') {
+            const stored = localStorage.getItem('theme');
+            if (stored) return stored;
+            if (window.matchMedia('(prefers-color-scheme: dark)').matches) return 'dark';
+            return 'light'; // Fallback / Default
+        }
+        return 'dark'; // Initial SSR
+    });
+
+    useEffect(() => {
+        const root = document.documentElement;
+        if (theme === 'dark') {
+            root.classList.add('dark');
+        } else {
+            root.classList.remove('dark');
+        }
+        localStorage.setItem('theme', theme);
+    }, [theme]);
+
     const [opportunities, setOpportunities] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -117,8 +138,8 @@ const Dashboard = () => {
     };
 
     if (loading) return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-slate-950 text-emerald-400 font-medium">
-            <div className="w-16 h-16 border-4 border-slate-800 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
+        <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 dark:bg-slate-950 text-emerald-600 dark:text-emerald-400 font-medium">
+            <div className="w-16 h-16 border-4 border-slate-200 dark:border-slate-800 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
             Loading ABIF Strategic Insights...
         </div>
     );
@@ -183,7 +204,7 @@ const Dashboard = () => {
     })();
 
     return (
-        <div className="min-h-screen bg-slate-950 text-slate-200 font-sans selection:bg-blue-500/30">
+        <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 font-sans selection:bg-blue-500/30 transition-colors duration-300">
             <div className="max-w-[1400px] mx-auto px-4 md:px-8 pt-6 pb-20 relative">
 
                 {error && (
@@ -195,7 +216,7 @@ const Dashboard = () => {
 
                 {isRefreshing && (
                     <div className="fixed top-8 right-8 z-[100]">
-                        <div className="bg-slate-800/90 backdrop-blur-xl border border-slate-700/80 shadow-2xl rounded-2xl p-5 w-[320px] transition-all animate-in slide-in-from-right-8 fade-in duration-300">
+                        <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-xl border border-slate-200 dark:border-slate-700/80 shadow-2xl rounded-2xl p-5 w-[320px] transition-all animate-in slide-in-from-right-8 fade-in duration-300">
                             {refreshSuccess ? (
                                 <div className="flex items-center gap-4 animate-in zoom-in-95 duration-300">
                                     <div className="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500 flex items-center justify-center text-emerald-400 font-bold shadow-[0_0_15px_rgba(16,185,129,0.3)]">✓</div>
@@ -232,14 +253,16 @@ const Dashboard = () => {
                     handleRefresh={handleRefresh}
                     isRefreshing={isRefreshing}
                     lastUpdated={lastUpdated}
+                    theme={theme}
+                    setTheme={setTheme}
                 />
 
                 {currentView === 'dashboard' ? (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
                         {/* Audience Toggle */}
-                        <div className="flex justify-center gap-2 mb-10 p-1.5 bg-slate-900 border border-slate-800 rounded-full w-fit mx-auto shadow-lg hover:border-slate-700 transition-all">
+                        <div className="flex justify-center gap-2 mb-10 p-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-full w-fit mx-auto shadow-lg hover:border-slate-300 dark:hover:border-slate-700 transition-all">
                             <button
-                                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${activeAudience === 'startup' ? 'bg-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'text-slate-500 hover:text-slate-300'}`}
+                                className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${activeAudience === 'startup' ? 'bg-blue-500 text-white shadow-[0_0_15px_rgba(59,130,246,0.5)]' : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'}`}
                                 onClick={() => { setActiveAudience('startup'); setActiveSector('All Sectors'); }}
                             >
                                 🚀 For My Startups
@@ -257,7 +280,7 @@ const Dashboard = () => {
                                 stats={stats}
                                 marketSentiment={marketSentiment}
                             />
-                            <div className="absolute top-4 right-4 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] px-2 py-1 rounded opacity-0 group-hover/briefing:opacity-100 transition-opacity uppercase font-black">
+                            <div className="absolute top-4 right-4 bg-emerald-100/50 dark:bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-[9px] px-2 py-1 rounded opacity-0 group-hover/briefing:opacity-100 transition-opacity uppercase font-black">
                                 Click to Expand Report
                             </div>
                         </div>
@@ -306,7 +329,7 @@ const Dashboard = () => {
                                 {visibleSections.map(section => (
                                     <div key={section.key} id={section.key} ref={el => { sectionRefs.current[section.key] = el; }} className="scroll-mt-36">
                                         <div className={`flex flex-wrap items-center gap-4 mb-6 border-l-4 pl-4 ${section.borderColor}`}>
-                                            <h2 className="text-2xl font-bold text-slate-100 italic tracking-tighter">{section.label}</h2>
+                                            <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 italic tracking-tighter">{section.label}</h2>
                                             <span className="text-sm font-medium text-slate-500 flex-1">{section.subtitle}</span>
                                             <span className="bg-slate-800 border border-slate-700 text-blue-400 text-sm font-bold px-3 py-1 rounded-full shadow-sm">
                                                 {section.items.length}
@@ -325,8 +348,8 @@ const Dashboard = () => {
                 ) : (
                     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700 mt-6 pt-10">
                         <div className="flex flex-wrap items-center gap-4 mb-8 border-l-4 border-slate-600 pl-4">
-                            <h2 className="text-2xl font-bold text-slate-300 italic tracking-tighter">🗄️ Closed Research Archive</h2>
-                            <p className="text-sm text-slate-500 flex-1 underline decoration-slate-700 underline-offset-4">Reference pool for benchmarking past grant success.</p>
+                            <h2 className="text-2xl font-bold text-slate-700 dark:text-slate-300 italic tracking-tighter">🗄️ Closed Research Archive</h2>
+                            <p className="text-sm text-slate-500 flex-1 underline decoration-slate-300 dark:decoration-slate-700 underline-offset-4">Reference pool for benchmarking past grant success.</p>
                         </div>
                         <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {opportunities.filter(o => ['Closed', 'Verify Manually'].includes(o.status)).map((scheme, i) => (
@@ -339,27 +362,27 @@ const Dashboard = () => {
             {/* Detailed Report Modal */}
             {showReport && report && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-                    <div className="fixed inset-0 bg-slate-950/80 backdrop-blur-sm" onClick={() => setShowReport(false)}></div>
-                    <div className="bg-slate-900 border border-slate-700 w-full max-w-2xl rounded-3xl overflow-hidden relative shadow-2xl animate-in fade-in zoom-in-95 duration-300">
-                        <div className="p-8 border-b border-slate-800 flex justify-between items-center bg-gradient-to-r from-slate-900 to-slate-800">
+                    <div className="fixed inset-0 bg-slate-900/40 dark:bg-slate-950/80 backdrop-blur-sm" onClick={() => setShowReport(false)}></div>
+                    <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 w-full max-w-2xl rounded-3xl overflow-hidden relative shadow-2xl animate-in fade-in zoom-in-95 duration-300">
+                        <div className="p-8 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center bg-gradient-to-r from-slate-50/50 to-white dark:from-slate-900 dark:to-slate-800">
                             <div>
-                                <h2 className="text-2xl font-black text-slate-100 tracking-tight">{report.title}</h2>
-                                <p className="text-xs text-emerald-400 font-mono mt-1 uppercase tracking-widest">Advanced Research Insights v2026.03</p>
+                                <h2 className="text-2xl font-black text-slate-800 dark:text-slate-100 tracking-tight">{report.title}</h2>
+                                <p className="text-xs text-emerald-600 dark:text-emerald-400 font-mono mt-1 uppercase tracking-widest">Advanced Research Insights v2026.03</p>
                             </div>
-                            <button onClick={() => setShowReport(false)} className="w-10 h-10 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center hover:bg-slate-700 transition-colors z-10">✕</button>
+                            <button onClick={() => setShowReport(false)} className="w-10 h-10 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors z-10 text-slate-600 dark:text-slate-400">✕</button>
                         </div>
                         <div className="p-8 space-y-8 max-h-[70vh] overflow-y-auto custom-scrollbar">
                             <div>
                                 <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Executive Summary</h4>
-                                <p className="text-slate-300 leading-relaxed font-medium">{report.executiveSummary}</p>
+                                <p className="text-slate-700 dark:text-slate-300 leading-relaxed font-medium">{report.executiveSummary}</p>
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 {report.keyTrends.map((t, idx) => (
-                                    <div key={idx} className="bg-slate-800/40 p-5 rounded-2xl border border-slate-700/50">
-                                        <h5 className="text-emerald-400 font-bold mb-2 flex items-center gap-2">
+                                    <div key={idx} className="bg-slate-50 dark:bg-slate-800/40 p-5 rounded-2xl border border-slate-200 dark:border-slate-700/50">
+                                        <h5 className="text-emerald-600 dark:text-emerald-400 font-bold mb-2 flex items-center gap-2">
                                             <span className="w-1 h-1 bg-emerald-500 rounded-full"></span> {t.trend}
                                         </h5>
-                                        <p className="text-xs text-slate-400 leading-relaxed font-medium">{t.detail}</p>
+                                        <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">{t.detail}</p>
                                     </div>
                                 ))}
                             </div>
@@ -367,15 +390,15 @@ const Dashboard = () => {
                                 <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest">Actionable Recommendations</h4>
                                 <div className="space-y-3">
                                     {report.actionableRecommendations.map((r, idx) => (
-                                        <div key={idx} className="flex gap-4 p-4 bg-blue-500/5 border border-blue-500/10 rounded-xl">
-                                            <span className="text-blue-400 font-bold">0{idx + 1}</span>
-                                            <p className="text-xs text-slate-300 font-medium leading-relaxed">{r}</p>
+                                        <div key={idx} className="flex gap-4 p-4 bg-blue-50 dark:bg-blue-500/5 border border-blue-100 dark:border-blue-500/10 rounded-xl">
+                                            <span className="text-blue-600 dark:text-blue-400 font-bold">0{idx + 1}</span>
+                                            <p className="text-xs text-slate-700 dark:text-slate-300 font-medium leading-relaxed">{r}</p>
                                         </div>
                                     ))}
                                 </div>
                             </div>
                         </div>
-                        <div className="p-6 bg-slate-950/50 border-t border-slate-800 text-[9px] text-slate-500 font-mono text-center uppercase tracking-widest">
+                        <div className="p-6 bg-slate-50 dark:bg-slate-950/50 border-t border-slate-200 dark:border-slate-800 text-[9px] text-slate-500 font-mono text-center uppercase tracking-widest">
                             {report.briefingFooter}
                         </div>
                     </div>

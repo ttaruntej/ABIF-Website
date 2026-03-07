@@ -1,4 +1,5 @@
 import React from 'react';
+import { Sun, Moon } from 'lucide-react';
 
 const Header = ({
     currentView,
@@ -6,26 +7,36 @@ const Header = ({
     handleExportCSV,
     handleRefresh,
     isRefreshing,
-    lastUpdated
+    lastUpdated,
+    theme,
+    setTheme
 }) => {
     return (
         <header className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
-            <div className="flex flex-col text-center md:text-left">
-                <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+            <div className="flex flex-col text-center md:text-left relative">
+                <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-blue-500 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent">
                     ABIF
                 </h1>
-                <p className="text-slate-400 text-sm font-semibold tracking-wider uppercase mt-1">
+                <p className="text-slate-500 dark:text-slate-400 text-sm font-semibold tracking-wider uppercase mt-1">
                     Opportunities Tracker
                 </p>
             </div>
 
             <div className="flex flex-col items-center md:items-end gap-3 w-full md:w-auto">
                 <div className="flex flex-wrap items-center justify-center md:justify-end gap-3 w-full">
+                    <button
+                        onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+                        className="p-2 rounded-xl transition-all duration-300 border bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-sm"
+                        aria-label="Toggle theme"
+                    >
+                        {theme === 'dark' ? <Sun size={20} className="text-amber-400" /> : <Moon size={20} className="text-blue-500" />}
+                    </button>
+
                     {/* View Toggle */}
                     <button
                         className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 border ${currentView === 'dashboard'
-                                ? 'bg-red-500/10 text-red-400 border-red-500/30 hover:bg-red-500/20'
-                                : 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30 hover:bg-emerald-500/20'
+                            ? 'bg-red-50 dark:bg-red-500/10 text-red-600 dark:text-red-400 border-red-200 dark:border-red-500/30 hover:bg-red-100 dark:hover:bg-red-500/20 shadow-sm'
+                            : 'bg-emerald-50 dark:bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-200 dark:border-emerald-500/30 hover:bg-emerald-100 dark:hover:bg-emerald-500/20 shadow-sm'
                             }`}
                         onClick={() => setCurrentView(currentView === 'dashboard' ? 'archive' : 'dashboard')}
                     >
@@ -34,7 +45,7 @@ const Header = ({
 
                     {/* Export */}
                     <button
-                        className="px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 border bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700"
+                        className="px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 border bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-sm"
                         onClick={handleExportCSV}
                     >
                         📥 Export CSV
@@ -42,7 +53,7 @@ const Header = ({
 
                     {/* Refresh */}
                     <button
-                        className="px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 border bg-blue-500/10 text-blue-400 border-blue-500/30 hover:bg-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed group"
+                        className="px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 border bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/30 hover:bg-blue-100 dark:hover:bg-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed group shadow-sm"
                         onClick={handleRefresh}
                         disabled={isRefreshing}
                     >
