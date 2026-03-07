@@ -1,18 +1,34 @@
-import React from 'react';
-import { Sun, Moon } from 'lucide-react';
+import React, { useState } from 'react';
+import { Sun, Moon, Mail, Send, X } from 'lucide-react';
 
 const Header = ({
     currentView,
     setCurrentView,
     handleExportCSV,
     handleRefresh,
+    handleEmailTrigger,
     isRefreshing,
     lastUpdated,
     theme,
     setTheme
 }) => {
+    const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
+    const [emailInput, setEmailInput] = useState('');
+    const [isSending, setIsSending] = useState(false);
+
+    const onSendClick = async () => {
+        setIsSending(true);
+        try {
+            await handleEmailTrigger(emailInput);
+            setIsEmailModalOpen(false);
+            setEmailInput('');
+        } finally {
+            setIsSending(false);
+        }
+    };
+
     return (
-        <header className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6">
+        <header className="flex flex-col md:flex-row justify-between items-center mb-10 gap-6 relative">
             <div className="flex flex-col text-center md:text-left relative">
                 <h1 className="text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-blue-500 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent">
                     ABIF
@@ -51,6 +67,14 @@ const Header = ({
                         📥 Export CSV
                     </button>
 
+                    {/* Email */}
+                    <button
+                        className="px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 border bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border-indigo-200 dark:border-indigo-500/30 hover:bg-indigo-100 dark:hover:bg-indigo-500/20 shadow-sm"
+                        onClick={() => setIsEmailModalOpen(true)}
+                    >
+                        <Mail size={16} /> Send Alert
+                    </button>
+
                     {/* Refresh */}
                     <button
                         className="px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 flex items-center gap-2 border bg-blue-50 dark:bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-200 dark:border-blue-500/30 hover:bg-blue-100 dark:hover:bg-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed group shadow-sm"
@@ -70,6 +94,44 @@ const Header = ({
                     Last Refreshed: {lastUpdated}
                 </div>
             </div>
+
+            {/* Email Modal */}
+            {isEmailModalOpen && (
+                <div className="absolute top-16 right-0 z-50 mt-2 w-80 bg-white dark:bg-slate-800 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-700 p-4 animate-in slide-in-from-top-2 fade-in">
+                    <div className="flex justify-between items-center mb-3">
+                        <h3 className="font-bold text-slate-800 dark:text-slate-200 text-sm flex items-center gap-2">
+                            <Mail size={16} className="text-indigo-500" /> Dispatch AI Alert
+                        </h3>
+                        <button onClick={() => setIsEmailModalOpen(false)} className="text-slate-400 hover:text-red-500">
+                            <X size={16} />
+                        </button>
+                    </div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mb-3">
+                        Send the daily intelligence briefing instantly. Leave blank to shoot it to the default team list.
+                    </p>
+                    <input
+                        type="text"
+                        placeholder="email1@u.com, email2@u.com"
+                        className="w-full text-sm placeholder-slate-400 text-slate-800 dark:text-slate-200 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-2 mb-3 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                        value={emailInput}
+                        onChange={(e) => setEmailInput(e.target.value)}
+                    />
+                    <button
+                        onClick={onSendClick}
+                        disabled={isSending}
+                        className="w-full bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-bold py-2 rounded-lg transition-colors flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+                    >
+                        {isSending ? (
+                            <span className="flex items-center gap-2">
+                                <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                                Sending...
+                            </span>
+                        ) : (
+                            <span className="flex items-center gap-2"><Send size={14} /> Dispatch Email</span>
+                        )}
+                    </button>
+                </div>
+            )}
         </header>
     );
 };

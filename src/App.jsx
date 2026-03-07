@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import './index.css';
 
-import { fetchOpportunities, triggerScraper, getScraperStatus, fetchResearchReport } from './services/api';
+import { fetchOpportunities, triggerScraper, getScraperStatus, fetchResearchReport, triggerEmail } from './services/api';
 import { exportToCSV } from './utils/csvExporter';
 import { generateBriefing } from './utils/aiBriefing';
 import { SECTIONS, CATEGORIES } from './constants/tracker';
@@ -125,6 +125,16 @@ const Dashboard = () => {
         } catch (err) {
             console.error('Trigger failed:', err.message);
             setIsRefreshing(false);
+        }
+    };
+
+    const handleEmailTrigger = async (targetEmails) => {
+        try {
+            await triggerEmail(targetEmails);
+            alert("Email delivery triggered successfully! Please wait a few moments for it to arrive.");
+        } catch (err) {
+            console.error('Email trigger failed:', err.message);
+            alert("Failed to trigger email. Check console for details.");
         }
     };
 

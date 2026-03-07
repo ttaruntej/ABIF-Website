@@ -23,3 +23,20 @@ export const fetchResearchReport = async () => {
     if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
     return await res.json();
 };
+
+export const triggerEmail = async (target_emails) => {
+    const res = await fetch('/api/trigger-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target_emails })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Failed to trigger email');
+    return data;
+};
+
+export const getEmailStatus = async () => {
+    const res = await fetch('/api/trigger-email', { method: 'GET' });
+    if (!res.ok) throw new Error('Failed to fetch email status');
+    return await res.json();
+};
