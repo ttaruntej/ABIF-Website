@@ -1019,7 +1019,7 @@ async function sendIncubatorReport(data) {
         const recipients = ABIF_TEAM_EMAIL.split(',').map(e => e.trim()).filter(e => e).join(', ');
 
         const info = await transporter.sendMail({
-            from: SMTP_FROM || '"ABIF Funding Bot" <noreply@abif.org>',
+            from: SMTP_FROM || '"Tarun Tej Thadana | ABIF IIT Kharagpur" <abif.tbimanager@gmail.com>',
             to: recipients,
             subject: `🚀 [ABIF Alert] ${incubatorOpps.length} Active Incubator Grants & Funding Opportunities`,
             html: htmlContent,
