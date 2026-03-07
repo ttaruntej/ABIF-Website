@@ -12,7 +12,9 @@
         "deploy": "gh-pages -d dist"
     },
     "dependencies": {
+        "@google/generative-ai": "^0.24.1",
         "cheerio": "^1.2.0",
+        "dotenv": "^17.3.1",
         "fs": "^0.0.1-security",
         "puppeteer": "^24.38.0",
         "puppeteer-extra": "^3.3.6",

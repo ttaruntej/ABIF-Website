@@ -18,4 +18,8 @@ export const getScraperStatus = async () => {
     if (!res.ok) throw new Error('Failed to fetch status');
     return await res.json();
 };
-
+export const fetchResearchReport = async () => {
+    const res = await fetch(`./data/research_report.json?v=${Date.now()}`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+    return await res.json();
+};

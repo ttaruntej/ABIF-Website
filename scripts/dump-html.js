@@ -23,8 +23,13 @@ async function dumpHTML(url, name) {
 }
 
 async function run() {
-    await dumpHTML('https://birac.nic.in/', 'BIRAC_Home');
-    await dumpHTML('https://birac.nic.in/cfp.php', 'BIRAC_CFP');
+    const args = process.argv.slice(2);
+    if (args.length >= 2) {
+        await dumpHTML(args[0], args[1]);
+    } else {
+        await dumpHTML('https://birac.nic.in/', 'BIRAC_Home');
+        await dumpHTML('https://birac.nic.in/cfp.php', 'BIRAC_CFP');
+    }
 }
 
 run();
