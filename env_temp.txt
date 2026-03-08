@@ -1,0 +1,16 @@
+GEMINI_API_KEY=AIzaSyB72Y2a72s3pdHbiDTxVC2gDhYgy6JhRBk
+
+# SMTP Email Configuration for Scraper Notifications
+# You only need to set these if you want to test email notifications locally.
+# In production, set these as Secrets in your GitHub repository setting:
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=abif.tbimanager@gmail.com
+SMTP_PASS=nzjehznppgmvsqsi
+SMTP_FROM="ABIF AI Agent" <abif.tbimanager@gmail.com>
+# To add multiple receivers, separate them with a comma:
+ABIF_TEAM_EMAIL=ttstdtdtd@gmail.com
+
+# NotebookLM Discovery Agent Config
+DISCOVERY_NOTEBOOK_ID=e462a468-ca93-4235-918b-3a1d419c7205
+DISCOVERY_QUERIES_PATH=./scripts/query_strategy.json
