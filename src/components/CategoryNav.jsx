@@ -8,41 +8,45 @@ const CategoryNav = ({
     currentView
 }) => {
     return (
-        <div className="sticky top-[72px] z-[90] mb-6 px-4">
-            <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-2 bg-white dark:bg-slate-950/40 backdrop-blur-md rounded-2xl border border-slate-200 dark:border-white/5 shadow-sm">
+        <div className="sticky top-[72px] z-[90] mb-6 px-3 sm:px-4">
+            <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 py-3 bg-white/80 dark:bg-slate-900/60 backdrop-blur-xl rounded-2xl border border-slate-200 dark:border-white/5 shadow-xl transition-all duration-300">
 
-                {/* Sector HUD - Minimalist */}
-                <div className="flex items-center gap-6 overflow-hidden flex-1">
-                    <div className="flex items-center gap-2 shrink-0 border-r border-slate-200 dark:border-slate-800 pr-6 mr-4">
+                {/* Sector HUD - Global Discovery Optimized */}
+                <div className="flex items-center gap-3 sm:gap-4 overflow-hidden flex-1 relative">
+                    <div className="hidden sm:flex items-center gap-2 shrink-0 border-r border-slate-200 dark:border-slate-800 pr-4 mr-1">
                         <Database size={12} className="text-blue-500" />
-                        <span className="text-[9px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">Sector Focus</span>
+                        <span className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">Focus</span>
                     </div>
 
-                    <div className="flex items-center gap-8 overflow-x-auto no-scrollbar py-1">
-                        {['All Sectors', ...availableSectors].map(sec => (
-                            <button
-                                key={sec}
-                                onClick={() => setActiveSector(sec)}
-                                className={`text-[10px] font-bold uppercase tracking-widest whitespace-nowrap transition-all duration-300 flex items-center gap-2 group/sec ${activeSector === sec
-                                    ? 'text-blue-600 dark:text-blue-400'
-                                    : 'text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
-                            >
-                                <div className={`w-1 h-1 rounded-full transition-all duration-500 ${activeSector === sec ? 'bg-blue-500 scale-125 shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'bg-slate-300 dark:bg-slate-800 opacity-30 group-hover/sec:opacity-100'}`} />
-                                {sec}
-                            </button>
-                        ))}
+                    {/* Scrollable Container with Discoverability Mask */}
+                    <div className="relative flex-1 overflow-hidden h-10 flex items-center">
+                        <div className="flex items-center gap-6 sm:gap-10 overflow-x-auto no-scrollbar py-2 mask-fade-right scroll-smooth snap-x">
+                            {['All Sectors', ...availableSectors].map(sec => (
+                                <button
+                                    key={sec}
+                                    onClick={() => setActiveSector(sec)}
+                                    className={`text-[11px] font-black uppercase tracking-widest whitespace-nowrap transition-all duration-300 flex items-center gap-3 group/sec py-2 px-1 snap-start cursor-pointer transition-transform active:scale-95 ${activeSector === sec
+                                        ? 'text-blue-600 dark:text-blue-400'
+                                        : 'text-slate-500 dark:text-slate-500 hover:text-slate-900 dark:hover:text-white'}`}
+                                >
+                                    <div className={`w-1.5 h-1.5 rounded-full transition-all duration-500 ${activeSector === sec ? 'bg-blue-500 scale-125 shadow-[0_0_12px_rgba(59,130,246,0.6)]' : 'bg-slate-300 dark:bg-slate-800 opacity-40 group-hover/sec:opacity-100'}`} />
+                                    {sec}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </div>
 
-                <div className="flex items-center gap-4 ml-6 pl-6 border-l border-slate-200 dark:border-slate-800 shrink-0">
-                    <div className="flex items-center gap-2">
-                        {currentView === 'archive' ? <History size={12} className="text-slate-400" /> : <Radar size={12} className="text-blue-500 animate-pulse" />}
-                        <span className="text-[9px] font-black text-slate-900 dark:text-white uppercase tracking-widest leading-none">
+                {/* Right side status indicators */}
+                <div className="flex items-center gap-3 sm:gap-4 ml-2 sm:ml-4 pl-2 sm:pl-4 border-l border-slate-200 dark:border-slate-800 shrink-0">
+                    <div className="flex items-center gap-2 cursor-pointer group/mode" title={currentView === 'archive' ? 'Access Vault Records' : 'Monitor Live Radar'}>
+                        {currentView === 'archive' ? <History size={13} className="text-slate-400 group-hover/mode:text-blue-500 transition-colors" /> : <Radar size={13} className="text-blue-500 animate-pulse" />}
+                        <span className="hidden sm:inline text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-widest leading-none">
                             {currentView === 'archive' ? 'VAULT' : 'RADAR'}
                         </span>
                     </div>
 
-                    <button className="hidden sm:flex items-center gap-2 group/info hover:text-blue-500 transition-colors ml-4">
+                    <button className="hidden md:flex items-center gap-2 group/info hover:text-blue-500 transition-colors ml-2 cursor-pointer">
                         <Info size={12} className="text-slate-500 group-hover/info:text-blue-500" />
                         <span className="text-[9px] font-black text-slate-500 dark:text-slate-600 uppercase tracking-widest leading-none">Context</span>
                     </button>

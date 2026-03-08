@@ -129,13 +129,20 @@ html {
     background: #334155;
 }
 
-/* Utilities for Command Rift */
+/* Utilities for Command Rift - Enhanced for Discoverability */
 .mask-fade-right {
-    mask-image: linear-gradient(to right, black 90%, transparent 100%);
+    mask-image: linear-gradient(to right, black 75%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black 75%, transparent 100%);
+}
+
+.mask-fade-left {
+    mask-image: linear-gradient(to left, black 75%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to left, black 75%, transparent 100%);
 }
 
 .mask-fade-both {
-    mask-image: linear-gradient(to right, transparent 0%, black 10%, black 90%, transparent 100%);
+    mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, black 15%, black 85%, transparent 100%);
 }
 
 .no-scrollbar::-webkit-scrollbar {
