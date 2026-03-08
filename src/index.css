@@ -184,18 +184,17 @@ input,
 }
 
 /* 
-   FINAL PRINT SOLUTION
-   This logic eliminates following white pages by using display: none 
-   instead of visibility: hidden.
+   PROFESSIONAL REPORT PRINT ARCHITECTURE
+   Optimized for ABIF IIT Kharagpur standards.
 */
 @media print {
 
-    /* 1. Hide everything globally */
+    /* Step 1: Hide all non-report elements from the DOM path */
     * {
         display: none !important;
     }
 
-    /* 2. Selectively Show ONLY the Report Path */
+    /* Step 2: Restore the report modal container path */
     html,
     body,
     #root,
@@ -205,88 +204,103 @@ input,
         display: block !important;
     }
 
-    /* 3. Reset Print Canvas */
+    /* Global Typography Fix for Print */
     html,
     body {
         height: auto !important;
-        margin: 0 !important;
-        padding: 0 !important;
         background: white !important;
         color: black !important;
         overflow: visible !important;
-        min-height: 0 !important;
-    }
-
-    #root,
-    #root>div {
-        height: auto !important;
-        width: 100% !important;
-        position: static !important;
+        font-family: 'Inter', sans-serif !important;
         margin: 0 !important;
         padding: 0 !important;
     }
 
-    /* 4. Fix Report Layout */
+    /* Sectional Controls */
     .print-report-active {
         position: static !important;
         width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
         background: white !important;
-        transform: none !important;
-        inset: auto !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
     #report-modal-content {
-        position: relative !important;
-        display: block !important;
+        position: static !important;
         width: 100% !important;
         max-width: none !important;
+        padding: 40px !important;
         background: white !important;
-        color: black !important;
-        padding: 2.5rem !important;
-        margin: 0 !important;
         border: none !important;
         box-shadow: none !important;
+        border-radius: 0 !important;
         height: auto !important;
         overflow: visible !important;
     }
 
-    /* Ensure scrollable area is expanded */
-    #report-modal-content .overflow-y-auto {
-        overflow: visible !important;
-        height: auto !important;
-        max-height: none !important;
-    }
-
-    /* UI Cleanup */
+    /* Hide the web-specific modal UI like Close button & download footer */
     .no-print,
     button,
     svg,
-    .no-print * {
+    [role="button"],
+    .p-8.border-b,
+    .px-8.py-6.border-t {
         display: none !important;
     }
 
-    /* Grid & Section Spacing */
-    section {
-        page-break-inside: avoid !important;
-        margin-bottom: 2.5rem !important;
+    /* Institutional Header Design */
+    .print\:block {
+        display: block !important;
     }
 
+    /* Text High-Contrast & Color Force */
+    #report-modal-content * {
+        color: black !important;
+        background: none !important;
+    }
+
+    p,
+    h1,
+    h2,
+    h3,
+    h4,
+    span {
+        color: black !important;
+    }
+
+    /* Spacing between Strategic Blocks */
+    section {
+        margin-bottom: 3.5rem !important;
+        page-break-inside: avoid !important;
+    }
+
+    /* Trend Cards Reset for Print */
     .grid {
         display: block !important;
     }
 
     .grid>div {
-        margin-bottom: 1.5rem !important;
+        margin-bottom: 2rem !important;
         page-break-inside: avoid !important;
+        border: 1px solid #e2e8f0 !important;
+        padding: 20px !important;
+        border-radius: 12px !important;
+        background: #f8fafc !important;
+        /* Light slate for subtle card structure in print */
     }
 
-    /* Force text contrast */
-    .text-slate-400,
-    .text-slate-500,
-    .text-slate-600,
-    .text-slate-700 {
-        color: #000 !important;
+    /* Executive Summary Boldness */
+    p.text-xl {
+        font-size: 1.25rem !important;
+        border-left: 6px solid #1e293b !important;
+        padding-left: 24px !important;
+        line-height: 1.6 !important;
+    }
+
+    /* Auto-Page Break Protection */
+    h2,
+    h3 {
+        page-break-after: avoid !important;
+        margin-top: 2rem !important;
     }
 }

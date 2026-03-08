@@ -514,6 +514,24 @@ const App = () => {
 
                         {/* Intelligence Content */}
                         <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+
+                            {/* PRINT-ONLY INSTITUTIONAL HEADER */}
+                            <div className="hidden print:block mb-12 border-b-2 border-slate-900 pb-8">
+                                <div className="flex justify-between items-start">
+                                    <div className="flex items-center gap-6">
+                                        <img src="https://abif.iitkgp.ac.in/logos/logo.png" alt="ABIF Logo" className="w-20 h-20 object-contain" />
+                                        <div>
+                                            <h1 className="text-3xl font-black text-slate-950 uppercase tracking-tighter">Agri-Business Incubation Centre</h1>
+                                            <p className="text-sm font-bold text-slate-600 uppercase tracking-widest">IIT Kharagpur • Strategic Funding Intelligence</p>
+                                        </div>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Report Serial</p>
+                                        <p className="text-sm font-black text-slate-900 tracking-tighter">#{new Date(report.generatedAt).getTime().toString().slice(-6)}</p>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div className="max-w-4xl mx-auto space-y-12 pb-8">
 
                                 {/* 1. Executive Summary */}
@@ -569,6 +587,13 @@ const App = () => {
                                         ))}
                                     </div>
                                 </section>
+
+                                {/* PRINT-ONLY DISCLOSURE */}
+                                <div className="hidden print:block pt-12 border-t border-slate-200 mt-12">
+                                    <p className="text-[9px] font-bold text-slate-400 leading-relaxed italic">
+                                        Disclaimer: This intelligence report is synthesized by the ABIF Neural Engine for strategic informational purposes. Real-time verification with original funder mandates is mandatory before capital engagement. All data corresponds to the research cycle recorded at the time of generation.
+                                    </p>
+                                </div>
                             </div>
                         </div>
 
