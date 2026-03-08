@@ -64,9 +64,9 @@ const SchemeCard = ({ scheme, showCategoryBadge, isArchivedMode }) => {
                 {/* Meta Tags (Nano Style) */}
                 <div className="flex flex-wrap gap-2 mb-6">
                     {scheme.category && scheme.category !== 'all' && (
-                        <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-widest flex items-center gap-1.5 ${isArchivedMode ? 'bg-slate-300 dark:bg-slate-800 text-slate-500' : 'bg-slate-950 dark:bg-white text-white dark:text-slate-900'
+                        <span className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase tracking-[0.15em] flex items-center gap-1.5 ${isArchivedMode ? 'bg-slate-300 dark:bg-slate-800 text-slate-500' : 'bg-slate-950 dark:bg-white text-white dark:text-slate-900'
                             }`}>
-                            {catMeta?.icon} {catMeta?.label}
+                            {catMeta?.icon} {catMeta?.label.toUpperCase()}
                         </span>
                     )}
                     {scheme.stages?.slice(0, 1).map(s => (

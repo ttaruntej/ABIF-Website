@@ -25,7 +25,7 @@ const Header = ({
     };
 
     return (
-        <header className="fixed top-9 left-0 right-0 z-[100] px-2 sm:px-4 py-3 pointer-events-none">
+        <header className="fixed top-9 left-0 right-0 z-[100] px-2 sm:px-4 py-0 pointer-events-none mt-2">
             <div className="max-w-7xl mx-auto flex items-center gap-2 sm:gap-4 pointer-events-auto bg-white/90 dark:bg-slate-900/40 backdrop-blur-3xl border border-slate-200 dark:border-white/5 h-14 rounded-full px-3 sm:px-4 shadow-2xl transition-all duration-700">
 
                 {/* Tactical Brand - Compact on mobile */}

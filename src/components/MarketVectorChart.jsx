@@ -42,7 +42,7 @@ const MarketVectorChart = ({ opportunities }) => {
                 </div>
                 <div className="flex items-center gap-2 px-2.5 py-1.5 bg-emerald-500/10 rounded-full">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest leading-none">Live Analysis</span>
+                    <span className="text-[8px] font-black text-emerald-600 uppercase tracking-widest leading-none">Analysis Active</span>
                 </div>
             </div>
 
@@ -86,16 +86,16 @@ const MarketVectorChart = ({ opportunities }) => {
                         const x = 100 + r * Math.cos(angle);
                         const y = 100 + r * Math.sin(angle);
 
-                        // Optimized Label strategy to prevent clipping
-                        const lx = 100 + 100 * Math.cos(angle);
-                        const ly = 100 + 100 * Math.sin(angle);
+                        // Advanced Label Strategy: No fixed width to prevent clipping
+                        const lx = 100 + 105 * Math.cos(angle);
+                        const ly = 100 + 105 * Math.sin(angle);
 
                         return (
                             <React.Fragment key={i}>
                                 <circle cx={x} cy={y} r="3.5" fill="rgb(59, 130, 246)" className="shadow-lg" />
-                                <foreignObject x={lx - 45} y={ly - 10} width="90" height="25">
-                                    <div className="flex flex-col items-center justify-center leading-none">
-                                        <span className="text-[9px] font-black text-slate-800 dark:text-white uppercase truncate w-full text-center">
+                                <foreignObject x={lx - 60} y={ly - 10} width="120" height="30">
+                                    <div className="flex flex-col items-center justify-center leading-tight">
+                                        <span className="text-[9px] font-black text-slate-800 dark:text-white uppercase w-full text-center drop-shadow-sm px-1">
                                             {d.name}
                                         </span>
                                         <span className="text-[8px] font-mono font-black text-blue-500 mt-1">{d.value}</span>
