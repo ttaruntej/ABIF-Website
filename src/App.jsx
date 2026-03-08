@@ -413,7 +413,12 @@ const App = () => {
 
             <main className="max-w-7xl mx-auto px-4 sm:px-8 pt-20 pb-20">
                 <div className={`animate-in delay-200 transition-all duration-700 ${currentView === 'archive' ? 'opacity-30 blur-sm pointer-events-none' : ''}`}>
-                    <StatsBoard stats={activeStats} marketSentiment={dynamicSentiment} onReportClick={() => setShowReport(true)} />
+                    <StatsBoard
+                        stats={activeStats}
+                        marketSentiment={dynamicSentiment}
+                        onReportClick={() => setShowReport(true)}
+                        opportunities={opportunities}
+                    />
                 </div>
 
                 <div ref={categoryNavRef}>

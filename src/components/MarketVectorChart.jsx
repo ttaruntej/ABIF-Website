@@ -1,0 +1,153 @@
+import React, { useMemo } from 'react';
+import { Radar, Activity, Zap } from 'lucide-react';
+
+const MarketVectorChart = ({ opportunities }) => {
+    // Process data for sector dominance
+    const chartData = useMemo(() => {
+        if (!opportunities || opportunities.length === 0) return [];
+
+        const sectorCounts = {};
+        opportunities.forEach(o => {
+            (o.sectors || []).forEach(s => {
+                sectorCounts[s] = (sectorCounts[s] || 0) + 1;
+            });
+        });
+
+        // Get top 6 sectors for the radar visualization
+        return Object.entries(sectorCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 6)
+            .map(([name, value]) => ({ name, value }));
+    }, [opportunities]);
+
+    const maxValue = Math.max(...chartData.map(d => d.value), 1);
+
+    if (chartData.length < 3) return null; // Need at least 3 points for a radar feel
+
+    return (
+        <div className="bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-200 dark:border-white/5 p-6 rounded-[32px] shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden relative flex flex-col h-full">
+            <div className="flex items-center justify-between mb-6 relative z-10">
+                <div className="flex items-center gap-3">
+                    <div className="p-2 bg-blue-500/10 rounded-lg">
+                        <Radar size={16} className="text-blue-500" />
+                    </div>
+                    <div>
+                        <h3 className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-tighter leading-none">Market Vector</h3>
+                        <p className="text-[8px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mt-1">Sector Dominance</p>
+                    </div>
+                </div>
+                <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/10 rounded-full">
+                    <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[7px] font-black text-emerald-600 uppercase tracking-widest leading-none">Live Analysis</span>
+                </div>
+            </div>
+
+            {/* Strategic Radar Visualization (High-Tech SVG) */}
+            <div className="flex-1 flex items-center justify-center relative min-h-[160px]">
+                <svg viewBox="0 0 200 200" className="w-full h-full max-w-[180px] drop-shadow-[0_0_15px_rgba(59,130,246,0.2)]">
+                    {/* Background Grid Rings */}
+                    {[0.25, 0.5, 0.75, 1].map((r, i) => (
+                        <circle
+                            key={i}
+                            cx="100" cy="100"
+                            r={80 * r}
+                            fill="none"
+                            stroke="currentColor"
+                            strokeWidth="0.5"
+                            className="text-slate-200 dark:text-slate-800 opacity-50"
+                        />
+                    ))}
+
+                    {/* Grid Lines */}
+                    {chartData.map((_, i) => {
+                        const angle = (i * 2 * Math.PI) / chartData.length;
+                        const x = 100 + 80 * Math.cos(angle);
+                        const y = 100 + 80 * Math.sin(angle);
+                        return (
+                            <line
+                                key={i}
+                                x1="100" y1="100"
+                                x2={x} y2={y}
+                                stroke="currentColor"
+                                strokeWidth="0.5"
+                                className="text-slate-200 dark:text-slate-800 opacity-50"
+                            />
+                        );
+                    })}
+
+                    {/* AI Data Mesh (The Radar Area) */}
+                    <path
+                        d={chartData.map((d, i) => {
+                            const angle = (i * 2 * Math.PI) / chartData.length;
+                            const r = (d.value / maxValue) * 80;
+                            const x = 100 + r * Math.cos(angle);
+                            const y = 100 + r * Math.sin(angle);
+                            return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
+                        }).join(' ') + ' Z'}
+                        fill="url(#radarGradient)"
+                        stroke="rgb(59, 130, 246)"
+                        strokeWidth="2"
+                        className="animate-pulse"
+                        style={{ filter: 'drop-shadow(0 0 8px rgba(59,130,246,0.4))' }}
+                    />
+
+                    {/* Data Points */}
+                    {chartData.map((d, i) => {
+                        const angle = (i * 2 * Math.PI) / chartData.length;
+                        const r = (d.value / maxValue) * 80;
+                        const x = 100 + r * Math.cos(angle);
+                        const y = 100 + r * Math.sin(angle);
+                        return (
+                            <circle key={i} cx={x} cy={y} r="3" fill="rgb(59, 130, 246)" className="transition-all duration-700 hover:r-4" />
+                        );
+                    })}
+
+                    {/* Dynamic Labeling Tooltip Simulation */}
+                    <defs>
+                        <radialGradient id="radarGradient" cx="100" cy="100" r="80" gradientUnits="userSpaceOnUse">
+                            <stop offset="0%" stopColor="rgba(59, 130, 246, 0.2)" />
+                            <stop offset="100%" stopColor="rgba(59, 130, 246, 0.6)" />
+                        </radialGradient>
+                    </defs>
+                </svg>
+
+                {/* Floating Sector Labels */}
+                {chartData.map((d, i) => {
+                    const angle = (i * 2 * Math.PI) / chartData.length;
+                    const x = 100 + 95 * Math.cos(angle);
+                    const y = 100 + 95 * Math.sin(angle);
+                    return (
+                        <div
+                            key={i}
+                            className="absolute text-[7px] font-black uppercase tracking-tighter text-slate-500 dark:text-slate-400 whitespace-nowrap leading-none"
+                            style={{
+                                left: `${(x / 200) * 100}%`,
+                                top: `${(y / 200) * 100}%`,
+                                transform: 'translate(-50%, -50%)'
+                            }}
+                        >
+                            {d.name.split(' ')[0]}
+                            <div className="text-[6px] text-blue-500 mt-1 text-center font-mono opacity-80">{d.value}M</div>
+                        </div>
+                    );
+                })}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-slate-100 dark:border-white/5 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                    <Activity size={10} className="text-slate-400" />
+                    <span className="text-[8px] font-black text-slate-400 uppercase tracking-widest">Active Pulse</span>
+                </div>
+                <div className="flex items-center gap-1">
+                    <Zap size={10} className="text-blue-500" />
+                    <span className="text-[8px] font-black text-blue-500 uppercase tracking-widest italic">{chartData[0]?.name.toUpperCase()} DOMINANCE</span>
+                </div>
+            </div>
+
+            {/* Background Decorative Mesh */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_107%_30%,rgba(59,130,246,0.03)_0%,rgba(59,130,246,0)_50%)] pointer-events-none" />
+        </div>
+    );
+};
+
+export default MarketVectorChart;

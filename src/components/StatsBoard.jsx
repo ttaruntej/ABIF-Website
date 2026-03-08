@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { TrendingUp, Target, DollarSign, Activity, FileText } from 'lucide-react';
+import MarketVectorChart from './MarketVectorChart';
 
-const StatsBoard = ({ stats, marketSentiment, onReportClick }) => {
+const StatsBoard = ({ stats, marketSentiment, onReportClick, opportunities }) => {
     const highlights = useMemo(() => [
         {
             label: 'Intelligence Scope',
@@ -38,29 +39,36 @@ const StatsBoard = ({ stats, marketSentiment, onReportClick }) => {
         <div className="mb-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
 
-                {/* Tactical Metrics Grid - Compacter */}
-                <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {highlights.map((h, i) => (
-                        <div key={i} className="group bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-200 dark:border-white/5 p-6 rounded-[32px] shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden relative">
-                            <div className="flex items-center justify-between mb-4 relative z-10">
-                                <div className={`p-3 rounded-xl ${h.bg} transition-transform duration-500 group-hover:scale-110`}>
-                                    <h.icon className={h.color} size={18} />
+                <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-12 gap-6">
+                    {/* Primary Metrics */}
+                    <div className="sm:col-span-7 grid grid-cols-1 gap-4">
+                        {highlights.map((h, i) => (
+                            <div key={i} className="group h-full bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-200 dark:border-white/5 px-6 py-5 rounded-[32px] shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden relative flex flex-col justify-center">
+                                <div className="flex items-center justify-between mb-3 relative z-10">
+                                    <div className={`p-2.5 rounded-xl ${h.bg} transition-transform duration-500 group-hover:scale-110`}>
+                                        <h.icon className={h.color} size={16} />
+                                    </div>
+                                    <div className="text-right">
+                                        <span className="text-[8px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">{h.sub}</span>
+                                        <h4 className="text-[9px] font-black text-slate-900 dark:text-white uppercase tracking-tighter mt-0.5">{h.label}</h4>
+                                    </div>
                                 </div>
-                                <div className="text-right">
-                                    <span className="text-[9px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">{h.sub}</span>
-                                    <h4 className="text-[10px] font-black text-slate-900 dark:text-white uppercase tracking-tighter mt-0.5">{h.label}</h4>
-                                </div>
-                            </div>
 
-                            <div className="relative z-10 flex items-baseline gap-2">
-                                <span className="text-4xl font-black text-slate-950 dark:text-white tracking-tighter tabular-nums">{h.val}</span>
-                                <div className="flex flex-col">
-                                    <span className={`text-[10px] font-black uppercase tracking-widest italic ${h.color}`}>Units</span>
-                                    <span className="text-[7px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest">{h.desc}</span>
+                                <div className="relative z-10 flex items-baseline gap-2">
+                                    <span className="text-3xl font-black text-slate-950 dark:text-white tracking-tighter tabular-nums leading-none">{h.val}</span>
+                                    <div className="flex flex-col">
+                                        <span className={`text-[9px] font-black uppercase tracking-widest italic leading-none ${h.color}`}>Units</span>
+                                        <span className="text-[7px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mt-1">{h.desc}</span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
+
+                    {/* Market Vector Visualization */}
+                    <div className="sm:col-span-5 h-full min-h-[300px] lg:min-h-0">
+                        <MarketVectorChart opportunities={opportunities} />
+                    </div>
                 </div>
 
                 {/* AI Briefing Command Center - Compacter */}
