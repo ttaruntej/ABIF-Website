@@ -55,6 +55,8 @@ const App = () => {
         isRefreshing,
         refreshSuccess,
         elapsedTime,
+        syncProgress,
+        cooldown,
         handleRefresh,
         getScraperMessage
     } = useScraperSync(addLog, loadData);
@@ -62,6 +64,7 @@ const App = () => {
     // 4. Email Dispatch Engine (via Custom Hook)
     const {
         emailNotification,
+        emailCooldown,
         handleEmailTrigger
     } = useEmailDispatch(addLog);
 
