@@ -87,19 +87,19 @@ const Header = ({
 
                 <div className="w-px h-6 bg-slate-200 dark:bg-slate-800 mx-1 shrink-0 hidden xl:block"></div>
 
-                {/* Audience Switcher - Integrated */}
-                <div className="hidden md:flex bg-slate-200/50 dark:bg-slate-950/60 p-1 rounded-full border border-slate-200 dark:border-slate-800/80 shrink-0">
+                {/* Audience Switcher - High Contrast Institutional Toggle */}
+                <div className="hidden md:flex bg-slate-100 dark:bg-slate-950 p-1 rounded-2xl border border-slate-200 dark:border-white/10 shrink-0 shadow-inner overflow-hidden">
                     <div className="relative flex">
-                        <div className={`absolute inset-y-0 h-full w-1/2 bg-white dark:bg-slate-800 shadow-md rounded-full transition-all duration-500 ${activeAudience === 'incubator' ? 'translate-x-full' : 'translate-x-0'}`} />
+                        <div className={`absolute inset-y-0 h-full w-1/2 bg-blue-600 shadow-[0_4px_15px_rgba(37,99,235,0.4)] rounded-xl transition-all duration-500 ease-out ${activeAudience === 'incubator' ? 'translate-x-full' : 'translate-x-0'}`} />
                         <button
                             onClick={() => { setActiveAudience('startup'); setActiveSector('All Sectors'); }}
-                            className={`relative z-10 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest w-18 sm:w-20 transition-colors cursor-pointer ${activeAudience === 'startup' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}
+                            className={`relative z-10 px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] w-24 sm:w-28 transition-colors cursor-pointer ${activeAudience === 'startup' ? 'text-white' : 'text-slate-400 dark:text-slate-600 hover:text-slate-900 dark:hover:text-slate-400'}`}
                         >
                             STARTUP
                         </button>
                         <button
                             onClick={() => { setActiveAudience('incubator'); setActiveSector('All Sectors'); }}
-                            className={`relative z-10 px-3 py-1 rounded-full text-[8px] font-black uppercase tracking-widest w-18 sm:w-20 transition-colors cursor-pointer ${activeAudience === 'incubator' ? 'text-blue-600 dark:text-blue-400' : 'text-slate-400'}`}
+                            className={`relative z-10 px-5 py-2 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] w-24 sm:w-28 transition-colors cursor-pointer ${activeAudience === 'incubator' ? 'text-white' : 'text-slate-400 dark:text-slate-600 hover:text-slate-900 dark:hover:text-slate-400'}`}
                         >
                             INSTITUTION
                         </button>

@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { TrendingUp, Target, DollarSign, Activity, FileText } from 'lucide-react';
+import { TrendingUp, Target, DollarSign, Activity, FileText, Radar } from 'lucide-react';
 import MarketVectorChart from './MarketVectorChart';
 
 const StatsBoard = ({ stats, marketSentiment, onReportClick, opportunities }) => {
@@ -39,62 +39,84 @@ const StatsBoard = ({ stats, marketSentiment, onReportClick, opportunities }) =>
         <div className="mb-8">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
 
+                {/* Left Side: Metrics & Radar (8 Columns) */}
                 <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-12 gap-6">
                     {/* Primary Metrics */}
                     <div className="sm:col-span-7 grid grid-cols-1 gap-4">
                         {highlights.map((h, i) => (
-                            <div key={i} className="group h-full bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-200 dark:border-white/5 px-6 py-5 rounded-[32px] shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden relative flex flex-col justify-center">
-                                <div className="flex items-center justify-between mb-3 relative z-10">
-                                    <div className={`p-2.5 rounded-xl ${h.bg} transition-transform duration-500 group-hover:scale-110`}>
-                                        <h.icon className={h.color} size={16} />
+                            <div key={i} className="group h-full command-box-depth backdrop-blur-2xl border border-slate-200 dark:border-white/10 px-6 py-6 rounded-[32px] shadow-[0_4px_20px_-4px_rgba(0,0,0,0.1)] hover:shadow-[0_20px_40px_-12px_rgba(0,0,0,0.2)] dark:hover:shadow-[0_20px_40px_-12px_rgba(59,130,246,0.15)] transition-all duration-500 overflow-hidden relative flex flex-col justify-center border-t border-l border-white/5">
+                                <div className="flex items-center justify-between mb-4 relative z-10">
+                                    <div className={`p-3 rounded-2xl ${h.bg} transition-transform duration-500 group-hover:scale-110 shadow-inner`}>
+                                        <h.icon className={h.color} size={18} />
                                     </div>
                                     <div className="text-right">
-                                        <span className="text-[8px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest">{h.sub}</span>
-                                        <h4 className="text-[9px] font-black text-slate-900 dark:text-white uppercase tracking-tighter mt-0.5">{h.label}</h4>
+                                        <span className="text-[9px] font-black text-slate-400 dark:text-slate-500 uppercase tracking-[0.2em]">{h.sub}</span>
+                                        <h4 className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-tighter mt-1">{h.label}</h4>
                                     </div>
                                 </div>
 
-                                <div className="relative z-10 flex items-baseline gap-2">
-                                    <span className="text-3xl font-black text-slate-950 dark:text-white tracking-tighter tabular-nums leading-none">{h.val}</span>
+                                <div className="relative z-10 flex items-baseline gap-3">
+                                    <span className="text-4xl font-black text-slate-950 dark:text-white tracking-tighter tabular-nums leading-none drop-shadow-sm">{h.val}</span>
                                     <div className="flex flex-col">
-                                        <span className={`text-[9px] font-black uppercase tracking-widest italic leading-none ${h.color}`}>Units</span>
-                                        <span className="text-[7px] font-bold text-slate-400 dark:text-slate-600 uppercase tracking-widest mt-1">{h.desc}</span>
+                                        <span className={`text-[10px] font-black uppercase tracking-widest italic leading-none ${h.color} group-hover:translate-x-1 transition-transform`}>Units</span>
+                                        <span className="text-[8px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-[0.1em] mt-1.5">{h.desc}</span>
                                     </div>
                                 </div>
+
+                                <div className={`absolute bottom-0 right-0 w-24 h-24 translate-x-12 translate-y-12 rounded-full opacity-[0.03] group-hover:opacity-[0.08] transition-opacity ${h.bg}`} />
                             </div>
                         ))}
                     </div>
 
                     {/* Market Vector Visualization */}
-                    <div className="sm:col-span-5 h-full min-h-[300px] lg:min-h-0">
+                    <div className="sm:col-span-5 h-full">
                         <MarketVectorChart opportunities={opportunities} />
                     </div>
                 </div>
 
-                {/* AI Briefing Command Center - Compacter */}
-                <div className="lg:col-span-4 bg-slate-950 dark:bg-white text-white dark:text-slate-950 rounded-[32px] p-6 shadow-2xl flex flex-col justify-between group relative overflow-hidden">
-                    <div className="relative z-10">
-                        <div className="flex items-center justify-between mb-4">
+                {/* Right Side: AI Briefing Command Center (4 Columns) */}
+                <div className="lg:col-span-4 bg-slate-950 text-white rounded-[32px] p-6 shadow-2xl flex flex-col group relative overflow-hidden h-full border border-white/5">
+                    <div className="relative z-10 flex-1 flex flex-col">
+                        <div className="flex items-center justify-between mb-6">
                             <div className="flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse" />
-                                <h3 className="text-[9px] font-black uppercase tracking-widest text-white/40 dark:text-slate-950/40">Ecosystem Insight</h3>
+                                <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_10px_rgba(59,130,246,0.8)]" />
+                                <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-white/50">Strategic Intelligence</h3>
                             </div>
-                            <Activity size={14} className="text-blue-400" />
+                            <Activity size={16} className="text-blue-400" />
                         </div>
 
-                        <p className="text-[12px] font-bold leading-relaxed italic opacity-95 group-hover:opacity-100 transition-opacity line-clamp-2 mb-4">
-                            "{briefingText}"
-                        </p>
+                        <div className="mb-8">
+                            <p className="text-[14px] font-bold leading-relaxed italic text-blue-100/90 tracking-tight">
+                                "{briefingText}"
+                            </p>
+                        </div>
 
-                        <div className="flex items-center gap-4 pt-4 border-t border-white/10 dark:border-slate-950/10">
+                        {/* Intelligence Timeline Simulation */}
+                        <div className="space-y-4 mb-6 relative">
+                            <div className="absolute left-[7px] top-1 bottom-1 w-px bg-white/10" />
+                            {[
+                                { label: 'Mandate Audit', val: `${stats.total} verified`, color: 'bg-blue-500' },
+                                { label: 'Liquidity Scan', val: `${stats.active} active`, color: 'bg-emerald-500' },
+                                { label: 'Vector Shift', val: 'Bullish focus', color: 'bg-amber-500' }
+                            ].map((log, i) => (
+                                <div key={i} className="flex items-center gap-4 relative z-10 transition-all hover:translate-x-1">
+                                    <div className={`w-3.5 h-3.5 rounded-full border-2 border-slate-950 ${log.color}`} />
+                                    <div className="flex justify-between items-center flex-1">
+                                        <span className="text-[9px] font-black uppercase tracking-widest text-white/40">{log.label}</span>
+                                        <span className="text-[10px] font-mono font-black text-blue-400">{log.val}</span>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        <div className="mt-auto flex items-center justify-between pt-6 border-t border-white/10">
                             <div>
-                                <p className="text-[8px] font-black text-white/40 dark:text-slate-950/40 uppercase tracking-widest">Sentiment</p>
-                                <div className={`text-[9px] font-black uppercase ${marketSentiment.color}`}>{marketSentiment.label.split(' / ')[0]}</div>
+                                <p className="text-[8px] font-black text-white/30 uppercase tracking-widest leading-none mb-1.5">Market Sentiment</p>
+                                <div className={`text-[10px] font-black uppercase tracking-[0.1em] ${marketSentiment.color}`}>{marketSentiment.label.split(' / ')[0]}</div>
                             </div>
-                            <div className="h-6 w-px bg-white/10 dark:bg-slate-950/10" />
                             <button
                                 onClick={onReportClick}
-                                className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-blue-400 hover:text-blue-300 ml-auto cursor-pointer"
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-600/10 hover:bg-blue-600/20 text-blue-400 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all cursor-pointer border border-blue-500/20"
                             >
                                 <FileText size={12} />
                                 Full Report
@@ -102,9 +124,12 @@ const StatsBoard = ({ stats, marketSentiment, onReportClick, opportunities }) =>
                         </div>
                     </div>
 
-                    {/* Background Decorative Mesh */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_107%,rgba(59,130,246,0.05)_0%,rgba(59,130,246,0)_50%)] pointer-events-none" />
+                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_107%,rgba(59,130,246,0.1)_0%,rgba(59,130,246,0)_50%)] pointer-events-none" />
+                    <div className="absolute top-0 right-0 p-8 opacity-10 blur-xl">
+                        <Radar size={120} className="rotate-45" />
+                    </div>
                 </div>
+
             </div>
         </div>
     );

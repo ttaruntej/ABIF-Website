@@ -39,21 +39,21 @@ const EcosystemTicker = ({ opportunities, lastUpdatedTs }) => {
     if (tickerItems.length === 0) return null;
 
     return (
-        <div className="fixed top-0 left-0 right-0 z-[110] bg-slate-950 text-white h-7 flex items-center overflow-hidden border-b border-white/5 pointer-events-none no-print">
+        <div className="fixed top-0 left-0 right-0 z-[110] bg-slate-950 text-white h-9 flex items-center overflow-hidden border-b border-white/5 pointer-events-none no-print">
             <div className="flex items-center whitespace-nowrap animate-ticker scroll-smooth">
                 {tickerItems.map((item, i) => (
-                    <div key={i} className="flex items-center gap-3 px-8 border-r border-white/10">
+                    <div key={i} className="flex items-center gap-4 px-10 border-r border-white/5">
                         {item.icon}
-                        <span className="text-[9px] font-black uppercase tracking-[0.2em] leading-none opacity-80">
+                        <span className="text-[11px] font-black uppercase tracking-[0.25em] leading-none opacity-90">
                             {item.text}
                         </span>
                     </div>
                 ))}
             </div>
 
-            {/* Legend Tag */}
-            <div className="absolute left-0 top-0 bottom-0 bg-blue-600 px-4 flex items-center shadow-[10px_0_20px_rgba(0,0,0,0.5)] z-10">
-                <span className="text-[8px] font-black italic uppercase tracking-tighter text-white">Live Intel Feed</span>
+            {/* Legend Tag - High Visibility */}
+            <div className="absolute left-0 top-0 bottom-0 bg-blue-700 px-6 flex items-center shadow-[10px_0_30px_rgba(0,0,0,0.8)] z-10 border-r border-white/10">
+                <span className="text-[9px] font-black italic uppercase tracking-widest text-white">Live Intel Feed</span>
             </div>
         </div>
     );
