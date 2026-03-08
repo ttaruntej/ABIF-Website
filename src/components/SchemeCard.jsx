@@ -22,8 +22,8 @@ const SchemeCard = ({ scheme, showCategoryBadge, isArchivedMode }) => {
 
     return (
         <div className={`group relative flex flex-col rounded-[40px] p-8 transition-all duration-700 overflow-hidden ${isArchivedMode
-                ? 'bg-slate-200/40 dark:bg-slate-800/20 border-slate-300 dark:border-white/5 opacity-80'
-                : 'bg-white/60 dark:bg-slate-900/40 border-white/20 dark:border-white/5 shadow-sm hover:shadow-3xl hover:-translate-y-2'
+            ? 'bg-slate-200/40 dark:bg-slate-800/20 border-slate-300 dark:border-white/5 opacity-80'
+            : 'bg-white dark:bg-slate-900/40 border-slate-200 dark:border-white/5 shadow-sm hover:shadow-3xl hover:-translate-y-2'
             } border`}>
 
             {/* Arclight Depth Stamp */}
@@ -57,8 +57,8 @@ const SchemeCard = ({ scheme, showCategoryBadge, isArchivedMode }) => {
                 </div>
 
                 <div className="flex items-center gap-2 mb-6">
-                    <Target size={12} className="text-slate-400 shrink-0" />
-                    <span className="text-[11px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-widest truncate">{scheme.body}</span>
+                    <Target size={12} className="text-slate-500 shrink-0" />
+                    <span className="text-[11px] font-black text-slate-500 dark:text-slate-600 uppercase tracking-widest truncate">{scheme.body}</span>
                 </div>
 
                 {/* Meta Tags (Nano Style) */}
@@ -78,7 +78,7 @@ const SchemeCard = ({ scheme, showCategoryBadge, isArchivedMode }) => {
                     ))}
                 </div>
 
-                <p className={`text-[13px] leading-relaxed line-clamp-3 mb-8 font-semibold italic ${isArchivedMode ? 'text-slate-400 dark:text-slate-600' : 'text-slate-500 dark:text-slate-400'
+                <p className={`text-[13px] leading-relaxed line-clamp-3 mb-8 font-semibold italic ${isArchivedMode ? 'text-slate-400 dark:text-slate-600' : 'text-slate-700 dark:text-slate-400'
                     }`}>
                     {scheme.description}
                 </p>

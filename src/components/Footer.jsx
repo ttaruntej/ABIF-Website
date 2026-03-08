@@ -1,101 +1,170 @@
 import React from 'react';
-import { ExternalLink, Github, Mail, Globe, MapPin, ShieldCheck } from 'lucide-react';
+import {
+    ExternalLink,
+    Linkedin,
+    Mail,
+    ShieldCheck,
+    Database,
+    Activity,
+    Cpu,
+    Zap,
+    MapPin
+} from 'lucide-react';
 
-const Footer = () => {
+const Footer = ({ lastUpdatedTs }) => {
     const currentYear = new Date().getFullYear();
 
+    const formatRelTime = (rawTs) => {
+        if (!rawTs) return 'INITIALIZING';
+        try {
+            const diff = Math.floor((Date.now() - parseInt(rawTs)) / 1000);
+            if (diff < 60) return 'SYNCHRONIZED';
+            if (diff < 3600) return `${Math.floor(diff / 60)}M AGO`;
+            if (diff < 86400) return `${Math.floor(diff / 3600)}H AGO`;
+            return 'RECENT';
+        } catch (e) { return 'STALE'; }
+    };
+
     return (
-        <footer className="mt-20 border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-950 transition-colors duration-300">
-            <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-12">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
-                    {/* Brand Column */}
-                    <div className="space-y-4">
-                        <a
-                            href="https://abif.iitkgp.ac.in"
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="flex items-center gap-3 hover:scale-[1.01] transition-transform origin-left"
-                        >
-                            <img
-                                src="https://abif.iitkgp.ac.in/logos/logo.png"
-                                alt="ABIF Logo"
-                                className="w-10 h-10 object-contain"
-                            />
-                            <div className="flex flex-col">
-                                <h2 className="text-2xl font-black bg-gradient-to-r from-blue-500 to-emerald-500 dark:from-blue-400 dark:to-emerald-400 bg-clip-text text-transparent italic">
-                                    ABIF
-                                </h2>
-                                <p className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest leading-none">
-                                    IIT Kharagpur
-                                </p>
+        <footer className="mt-20 border-t border-slate-200 dark:border-white/5 bg-slate-50 dark:bg-slate-950 transition-all duration-1000 overflow-hidden relative">
+            {/* Aesthetic Background Accents */}
+            <div className="absolute top-0 left-1/4 w-px h-full bg-gradient-to-b from-blue-500/10 to-transparent hidden lg:block" />
+            <div className="absolute top-0 left-2/4 w-px h-full bg-gradient-to-b from-slate-500/5 to-transparent hidden lg:block" />
+            <div className="absolute top-0 left-3/4 w-px h-full bg-gradient-to-b from-emerald-500/10 to-transparent hidden lg:block" />
+
+            <div className="max-w-[1400px] mx-auto px-6 md:px-12 py-16 relative z-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16 mb-20">
+
+                    {/* Column 1: Strategic Mandates */}
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                            <Zap size={14} className="text-blue-500" />
+                            <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.3em]">Strategic Mandates</h4>
+                        </div>
+                        <ul className="space-y-4">
+                            <li>
+                                <a href="https://abif.iitkgp.ac.in/apply/incubation" target="_blank" rel="noopener noreferrer" className="group flex flex-col">
+                                    <span className="text-[12px] font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-500 transition-colors flex items-center gap-2">
+                                        Apply for Incubation <ExternalLink size={10} className="opacity-0 group-hover:opacity-100 transition-all" />
+                                    </span>
+                                    <span className="text-[9px] text-slate-400 dark:text-slate-500 font-medium mt-1 uppercase tracking-wider">Early-stage agri-tech support</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://abif.iitkgp.ac.in/apply/samridh" target="_blank" rel="noopener noreferrer" className="group flex flex-col">
+                                    <span className="text-[12px] font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-500 transition-colors flex items-center gap-2">
+                                        SAMRIDH Accelerator <ExternalLink size={10} className="opacity-0 group-hover:opacity-100 transition-all" />
+                                    </span>
+                                    <span className="text-[9px] text-slate-400 dark:text-slate-500 font-medium mt-1 uppercase tracking-wider">MeitY matching fund program</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    {/* Column 2: Network Resources */}
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                            <Database size={14} className="text-emerald-500" />
+                            <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.3em]">Network Resources</h4>
+                        </div>
+                        <ul className="space-y-3">
+                            {[
+                                { label: 'Portfolio Startups', url: 'https://abif.iitkgp.ac.in/startups' },
+                                { label: 'Strategic Mentor Pool', url: 'https://abif.iitkgp.ac.in/mentors' },
+                                { label: 'Registered FPOs', url: 'https://abif.iitkgp.ac.in/fpo' },
+                                { label: 'Ecosystem Events', url: 'https://abif.iitkgp.ac.in/events' }
+                            ].map((link, i) => (
+                                <li key={i}>
+                                    <a href={link.url} target="_blank" rel="noopener noreferrer" className="text-[11px] font-bold text-slate-600 dark:text-slate-400 hover:text-emerald-500 transition-colors uppercase tracking-widest flex items-center justify-between group">
+                                        {link.label}
+                                        <div className="w-1 h-1 bg-slate-300 dark:bg-slate-800 rounded-full group-hover:bg-emerald-500 transition-colors" />
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Column 3: Institutional Anchor */}
+                    <div className="space-y-6">
+                        <div className="flex items-center gap-3">
+                            <ShieldCheck size={14} className="text-slate-400" />
+                            <h4 className="text-[10px] font-black text-slate-400 dark:text-slate-600 uppercase tracking-[0.3em]">Institutional Anchor</h4>
+                        </div>
+                        <div className="space-y-5">
+                            <div className="flex items-start gap-4">
+                                <img src="https://upload.wikimedia.org/wikipedia/en/1/1c/IIT_Kharagpur_Logo.svg" alt="IITKGP" className="w-8 h-8 object-contain opacity-90" />
+                                <div className="flex flex-col">
+                                    <a href="http://www.iitkgp.ac.in/" target="_blank" rel="noopener noreferrer" className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-tighter hover:text-blue-500 transition-colors">IIT Kharagpur</a>
+                                    <span className="text-[9px] text-slate-500 dark:text-slate-500 uppercase font-bold mt-0.5">AgFE Department Host</span>
+                                </div>
                             </div>
-                        </a>
-                        <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-xs">
-                            Agri-Business Incubation Foundation (ABIF) at IIT Kharagpur is dedicated to nurturing agri-tech innovations and empowering startups through strategic funding and resources.
-                        </p>
-                        <div className="flex items-center gap-4 text-slate-400 dark:text-slate-500">
-                            <a href="#" className="hover:text-blue-500 transition-colors"><Mail size={18} /></a>
-                            <a href="#" className="hover:text-blue-500 transition-colors"><Github size={18} /></a>
-                            <a href="https://abif.iitkgp.ac.in" target="_blank" rel="noopener noreferrer" className="hover:text-blue-500 transition-colors"><Globe size={18} /></a>
+                            <div className="flex items-start gap-4">
+                                <img src="https://www.nabard.org/auth/writereaddata/ContentImgs/1303194734NABARD-ENG-logo-big.png?csrt=15321406628350142152" alt="NABARD" className="w-8 h-8 object-contain" />
+                                <div className="flex flex-col">
+                                    <a href="https://www.nabard.org/" target="_blank" rel="noopener noreferrer" className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-tighter hover:text-emerald-500 transition-colors">NABARD</a>
+                                    <span className="text-[9px] text-slate-500 dark:text-slate-500 uppercase font-bold mt-0.5">Strategic Funding Partner</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    {/* Resources */}
-                    <div>
-                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-widest mb-6 border-b border-slate-100 dark:border-slate-800 pb-2 w-fit">
-                            Intelligence Hub
-                        </h4>
-                        <ul className="space-y-3">
-                            <li><a href="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-500 flex items-center gap-2 group">Market Insights <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" /></a></li>
-                            <li><a href="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-500 flex items-center gap-2 group">Agri-Tech Trends <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" /></a></li>
-                            <li><a href="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-500 flex items-center gap-2 group">Funding Repository <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" /></a></li>
-                            <li><a href="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-500 flex items-center gap-2 group">Ecosystem Map <ExternalLink size={12} className="opacity-0 group-hover:opacity-100 transition-opacity" /></a></li>
-                        </ul>
-                    </div>
-
-                    {/* Support */}
-                    <div>
-                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 uppercase tracking-widest mb-6 border-b border-slate-100 dark:border-slate-800 pb-2 w-fit">
-                            Platform Info
-                        </h4>
-                        <ul className="space-y-3">
-                            <li className="flex items-start gap-3">
-                                <ShieldCheck size={16} className="text-emerald-500 mt-0.5 shrink-0" />
-                                <span className="text-sm text-slate-600 dark:text-slate-400">AI-Verified Funding Links</span>
-                            </li>
-                            <li className="flex items-start gap-3">
-                                <MapPin size={16} className="text-blue-500 mt-0.5 shrink-0" />
-                                <span className="text-sm text-slate-600 dark:text-slate-400">IIT Kharagpur, West Bengal, India</span>
-                            </li>
-                            <li><a href="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-500">System Status</a></li>
-                            <li><a href="#" className="text-sm text-slate-600 dark:text-slate-400 hover:text-blue-500">Contact Team ABIF</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Disclaimer */}
-                    <div className="bg-slate-50 dark:bg-slate-900/50 p-6 rounded-2xl border border-slate-100 dark:border-slate-800/50">
-                        <h4 className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-3">Notice of Limitation</h4>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed font-medium italic">
-                            All funding opportunities and market insights are generated using autonomous scraping and AI analysis. While we strive for 100% accuracy, users are strictly advised to perform manual due diligence before applying.
-                        </p>
-                        <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-                            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-mono font-bold uppercase">Radar Active v2.4</span>
+                    {/* Column 4: Operational Pulse */}
+                    <div className="space-y-6 lg:pl-4">
+                        <div className="bg-white/50 dark:bg-slate-900/50 rounded-[24px] p-6 border border-slate-100 dark:border-white/5 shadow-sm">
+                            <div className="flex items-center justify-between mb-4">
+                                <h4 className="text-[9px] font-black text-slate-800 dark:text-white uppercase tracking-widest">System Pulse</h4>
+                                <Activity size={12} className="text-blue-500" />
+                            </div>
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[9px] font-bold text-slate-400 uppercase">Radar Status</span>
+                                    <span className="text-[9px] font-black text-emerald-500 uppercase flex items-center gap-1.5">
+                                        <div className="w-1 h-1 bg-emerald-500 rounded-full animate-pulse" />
+                                        {formatRelTime(lastUpdatedTs)}
+                                    </span>
+                                </div>
+                                <div className="flex items-center justify-between">
+                                    <span className="text-[9px] font-bold text-slate-400 uppercase">Core Version</span>
+                                    <span className="text-[9px] font-black text-slate-600 dark:text-slate-400 uppercase italic">v2.9.0-Stable</span>
+                                </div>
+                            </div>
+                            <div className="mt-5 pt-5 border-t border-slate-100 dark:border-white/5 flex gap-4">
+                                <a href="https://www.linkedin.com/company/agri-business-incubation-foundation-iit-kharagpur-abif/" target="_blank" rel="noopener noreferrer" className="text-slate-400 hover:text-blue-500 transition-colors">
+                                    <Linkedin size={16} />
+                                </a>
+                                <a href="mailto:abif@iitkgp.ac.in" className="text-slate-400 hover:text-blue-500 transition-colors">
+                                    <Mail size={16} />
+                                </a>
+                                <div className="h-4 w-px bg-slate-200 dark:bg-slate-800" />
+                                <a href="https://abif.iitkgp.ac.in/recruitment" target="_blank" rel="noopener noreferrer" className="text-[9px] font-black text-slate-900 dark:text-white uppercase tracking-widest hover:text-blue-500 transition-colors">Recruitments</a>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                {/* Bottom Bar */}
-                <div className="pt-8 border-t border-slate-100 dark:border-slate-900 flex flex-col md:flex-row justify-between items-center gap-4">
-                    <p className="text-xs text-slate-500 dark:text-slate-500 font-medium">
-                        © {currentYear} ABIF IIT Kharagpur. All rights reserved.
-                    </p>
-                    <div className="flex gap-6">
-                        <a href="#" className="text-[10px] font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 uppercase tracking-widest transition-colors">Privacy Policy</a>
-                        <a href="#" className="text-[10px] font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 uppercase tracking-widest transition-colors">Terms of Service</a>
-                        <a href="#" className="text-[10px] font-bold text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 uppercase tracking-widest transition-colors">Data Ethics</a>
+                {/* Bottom Legal Trace */}
+                <div className="pt-8 border-t border-slate-200 dark:border-white/10 flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div className="flex items-center gap-4">
+                        <div className="p-2 bg-slate-900 dark:bg-white rounded-lg">
+                            <Cpu size={12} className="text-white dark:text-slate-900" />
+                        </div>
+                        <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
+                            &copy; {currentYear} ABIF IIT KHARAGPUR. ASSET OF TBI ECOSYSTEM.
+                        </p>
+                    </div>
+
+                    <div className="flex gap-8">
+                        <a href="https://abif.iitkgp.ac.in/tenders" target="_blank" rel="noopener noreferrer" className="text-[9px] font-black text-slate-400 hover:text-slate-900 dark:hover:text-white uppercase tracking-[0.2em] transition-colors italic">Notices & Tenders</a>
+                        <div className="flex items-center gap-2 text-slate-400">
+                            <MapPin size={10} />
+                            <span className="text-[9px] font-bold uppercase tracking-widest">Kharagpur, India</span>
+                        </div>
                     </div>
                 </div>
             </div>
+
+            {/* Lower Shadow Accent */}
+            <div className="absolute bottom-0 left-0 w-full h-1 bg-gradient-to-r from-blue-500/20 via-emerald-500/20 to-blue-500/20" />
         </footer>
     );
 };

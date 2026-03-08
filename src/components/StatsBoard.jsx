@@ -41,7 +41,7 @@ const StatsBoard = ({ stats, marketSentiment, onReportClick }) => {
                 {/* Tactical Metrics Grid - Compacter */}
                 <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-4">
                     {highlights.map((h, i) => (
-                        <div key={i} className="group bg-white/40 dark:bg-slate-900/40 backdrop-blur-2xl border border-white/20 dark:border-white/5 p-6 rounded-[32px] shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden relative">
+                        <div key={i} className="group bg-white dark:bg-slate-900/40 backdrop-blur-2xl border border-slate-200 dark:border-white/5 p-6 rounded-[32px] shadow-sm hover:shadow-xl transition-all duration-500 overflow-hidden relative">
                             <div className="flex items-center justify-between mb-4 relative z-10">
                                 <div className={`p-3 rounded-xl ${h.bg} transition-transform duration-500 group-hover:scale-110`}>
                                     <h.icon className={h.color} size={18} />

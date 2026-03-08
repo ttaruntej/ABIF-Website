@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
 import './index.css';
 
 import { fetchOpportunities, triggerScraper, getScraperStatus, fetchResearchReport, triggerEmail, getEmailStatus } from './services/api';
@@ -13,14 +13,14 @@ import SchemeCard from './components/SchemeCard';
 import EmptyState from './components/EmptyState';
 import Footer from './components/Footer';
 import TacticalSpear from './components/TacticalSpear';
-
+import { Activity, X, TrendingUp, CheckCircle2, Cpu } from 'lucide-react';
 
 const App = () => {
     // Theme setup
     const [theme, setTheme] = useState(() => {
         try {
-            return localStorage.getItem('theme') || 'dark';
-        } catch (e) { return 'dark'; }
+            return localStorage.getItem('theme') || 'light';
+        } catch (e) { return 'light'; }
     });
 
     useEffect(() => {
@@ -100,11 +100,6 @@ const App = () => {
             const [reportData] = await Promise.allSettled([fetchResearchReport()]);
             if (reportData.status === 'fulfilled') setReport(reportData.value);
 
-            const active = data.filter(o => ['Open', 'Rolling', 'Closing Soon'].includes(o.status)).length;
-            const closing = data.filter(o => o.status === 'Closing Soon').length;
-            const dynamicBriefing = generateBriefing(data);
-
-            setStats({ total: data.length, active, closingSoon: closing, briefing: dynamicBriefing });
             setError(null);
 
             const nowTs = Date.now().toString();
@@ -232,6 +227,22 @@ const App = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
+    const handleDownloadPDF = () => {
+        window.print();
+    };
+
+    const handleSyncIntelligence = async () => {
+        try {
+            const freshReport = await fetchResearchReport();
+            if (freshReport) {
+                setReport(freshReport);
+                addLog('Intelligence Refreshed', 'success');
+            }
+        } catch (e) {
+            addLog('Report Refresh Failed', 'error');
+        }
+    };
+
     const scrollToFilters = () => {
         if (categoryNavRef.current) {
             const yOffset = -72; // Header height
@@ -268,8 +279,78 @@ const App = () => {
         return "Synthesizing Intelligence...";
     };
 
+    // 4. Dynamic Insights & Stats Calculation
+    const { filtered, catCounts, activeStats, availableSectors, dynamicSentiment } = useMemo(() => {
+        // Base matching logic
+        const matches = (o, filters = {}) => {
+            const {
+                audience = activeAudience,
+                category = activeCategory,
+                sector = activeSector,
+                status = activeStatus,
+                search = searchQuery,
+                view = currentView
+            } = filters;
+
+            const matchesAudience = audience === 'all' || (o.targetAudience || []).includes(audience);
+            const matchesCategory = category === 'all' || (o.category || '').toLowerCase() === category;
+            const matchesSector = sector === 'All Sectors' || (o.sectors || []).includes(sector);
+            const matchesStatus = status === 'all' ||
+                (status === 'Open' ? ['Open', 'Closing Soon'].includes(o.status) : o.status === status);
+            const matchesSearch = !search ||
+                (o.name || '').toLowerCase().includes(search.toLowerCase()) ||
+                (o.description || '').toLowerCase().includes(search.toLowerCase());
+
+            const isArchive = ['Closed', 'Verify Manually'].includes(o.status);
+            const matchesView = view === 'dashboard' ? !isArchive : isArchive;
+
+            return matchesAudience && matchesCategory && matchesSector && matchesStatus && matchesSearch && matchesView;
+        };
+
+        // 1. Filtered Opportunities (The ones actually displayed)
+        const filteredResult = opportunities.filter(o => matches(o));
+
+        // 2. Category Counts
+        // For each category, count items that match all CURRENT active filters EXCEPT the category filter itself
+        // This allows the user to see how many items exist in other categories given their other filter settings (search, audience, etc.)
+        const counts = {};
+        CATEGORIES.forEach(c => {
+            counts[c.key] = opportunities.filter(o => matches(o, { category: c.key })).length;
+        });
+
+        // 3. Stats for StatsBoard
+        // Stats should reflect the current context (audience, search, etc.)
+        const activeItems = opportunities.filter(o => matches(o, { status: 'all', view: 'dashboard' }));
+        const statsObj = {
+            total: activeItems.length,
+            active: activeItems.filter(o => ['Open', 'Rolling', 'Closing Soon'].includes(o.status)).length,
+            closingSoon: activeItems.filter(o => o.status === 'Closing Soon').length,
+            briefing: generateBriefing(activeItems)
+        };
+
+        // 4. Available Sectors
+        const sectors = Array.from(new Set(
+            opportunities
+                .filter(o => matches(o, { sector: 'All Sectors' }))
+                .flatMap(o => o.sectors || [])
+        )).sort();
+
+        // 5. Market Sentiment
+        const sentiment = (statsObj.active / (statsObj.total || 1)) > 0.5
+            ? { label: 'Aggressive / Bullish', color: 'text-emerald-400', bg: 'bg-emerald-500/10' }
+            : { label: 'Transition / Stable', color: 'text-blue-400', bg: 'bg-blue-500/10' };
+
+        return {
+            filtered: filteredResult,
+            catCounts: counts,
+            activeStats: statsObj,
+            availableSectors: sectors,
+            dynamicSentiment: sentiment
+        };
+    }, [opportunities, activeAudience, activeCategory, activeSector, activeStatus, searchQuery, currentView]);
+
     if (loading) return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-slate-950 text-blue-500 font-black tracking-[0.5em] uppercase text-center px-4">
+        <div className={`flex flex-col items-center justify-center min-h-screen ${theme === 'dark' ? 'bg-slate-950 text-blue-500' : 'bg-slate-50 text-blue-600'} font-black tracking-[0.5em] uppercase text-center px-4 transition-colors duration-500`}>
             <div className="w-12 h-1 bg-blue-500/20 rounded-full mb-4 overflow-hidden relative">
                 <div className="absolute inset-0 bg-blue-500 animate-scan"></div>
             </div>
@@ -277,37 +358,9 @@ const App = () => {
         </div>
     );
 
-    // Filter Orchestration
-    const filtered = opportunities.filter(o => {
-        const matchesAudience = activeAudience === 'all' || o.targetAudience?.includes(activeAudience);
-        const matchesCategory = activeCategory === 'all' || (o.category || '').toLowerCase() === activeCategory;
-        const matchesSector = activeSector === 'All Sectors' || o.sectors?.includes(activeSector);
-        const matchesStatus = activeStatus === 'all' ||
-            (activeStatus === 'Open' ? ['Open', 'Closing Soon'].includes(o.status) : o.status === activeStatus);
-        const matchesSearch = !searchQuery ||
-            (o.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-            (o.description || '').toLowerCase().includes(searchQuery.toLowerCase());
-
-        const isArchive = ['Closed', 'Verify Manually'].includes(o.status);
-        const matchesView = currentView === 'dashboard' ? !isArchive : isArchive;
-
-        return matchesAudience && matchesCategory && matchesSector && matchesStatus && matchesSearch && matchesView;
-    });
-
-    const availableSectors = Array.from(new Set(opportunities.filter(o => activeAudience === 'all' || o.targetAudience?.includes(activeAudience)).flatMap(o => o.sectors || []))).sort();
-
-    const catCounts = {};
-    CATEGORIES.forEach(c => {
-        catCounts[c.key] = opportunities.filter(o => c.key === 'all' || o.category === c.key).length;
-    });
-
     const visibleSections = currentView === 'archive'
         ? [{ key: 'vault', label: 'Vault Records', subtitle: 'Archive Database', borderColor: 'border-slate-400', items: filtered }].filter(s => s.items.length > 0)
         : SECTIONS.map(s => ({ ...s, items: filtered.filter(s.filter) })).filter(s => s.items.length > 0);
-
-    const marketSentiment = (stats.active / (stats.total || 1)) > 0.5
-        ? { label: 'Aggressive / Bullish', color: 'text-emerald-400', bg: 'bg-emerald-500/10' }
-        : { label: 'Transition / Stable', color: 'text-blue-400', bg: 'bg-blue-500/10' };
 
     return (
         <div className={`min-h-screen transition-colors duration-1000 selection:bg-blue-500/30 ${currentView === 'archive' ? 'bg-slate-100 dark:bg-slate-900 arclight-gradient' : 'bg-slate-50 dark:bg-slate-950'}`}>
@@ -353,7 +406,7 @@ const App = () => {
 
             <main className="max-w-7xl mx-auto px-4 sm:px-8 pt-20 pb-20">
                 <div className={`animate-in delay-200 transition-all duration-700 ${currentView === 'archive' ? 'opacity-30 blur-sm pointer-events-none' : ''}`}>
-                    <StatsBoard stats={stats} marketSentiment={marketSentiment} onReportClick={() => setShowReport(true)} />
+                    <StatsBoard stats={activeStats} marketSentiment={dynamicSentiment} onReportClick={() => setShowReport(true)} />
                 </div>
 
                 <div ref={categoryNavRef}>
@@ -432,15 +485,98 @@ const App = () => {
             {showReport && report && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-md animate-in fade-in" onClick={() => setShowReport(false)}></div>
-                    <div className="relative w-full max-w-4xl bg-white dark:bg-slate-900 border border-white/10 rounded-[32px] overflow-hidden shadow-2xl animate-shutter">
-                        <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-900">
-                            <div>
-                                <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic">{report.title}</h2>
+                    <div id="report-modal-content" className="relative w-full max-w-5xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-[40px] overflow-hidden shadow-2xl animate-shutter flex flex-col max-h-[90vh]">
+                        {/* Intelligence Header */}
+                        <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/50">
+                            <div className="flex items-center gap-4">
+                                <div className="p-3 bg-blue-500 rounded-2xl shadow-[0_0_20px_rgba(59,130,246,0.5)]">
+                                    <Activity className="text-white" size={24} />
+                                </div>
+                                <div className="flex flex-col">
+                                    <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic leading-none">{report.title}</h2>
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Autonomous Research Cycle</span>
+                                        <div className="px-2 py-0.5 bg-slate-200 dark:bg-slate-800 rounded-md text-[9px] font-bold text-slate-600 dark:text-slate-400">
+                                            {new Date(report.generatedAt).toLocaleDateString()} • {new Date(report.generatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <button onClick={() => setShowReport(false)} className="text-xl font-black">✕</button>
+                            <button onClick={() => setShowReport(false)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/5 text-slate-400 hover:text-red-500 transition-all active:scale-90">
+                                <X size={24} />
+                            </button>
                         </div>
-                        <div className="p-8 max-h-[60vh] overflow-y-auto custom-scrollbar">
-                            <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed font-bold italic">{report.executiveSummary}</p>
+
+                        {/* Intelligence Content */}
+                        <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
+                            <div className="max-w-4xl mx-auto space-y-12 pb-8">
+
+                                {/* 1. Executive Summary */}
+                                <section>
+                                    <div className="flex items-center gap-2 mb-6">
+                                        <div className="w-1 h-4 bg-blue-500 rounded-full" />
+                                        <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Strategic Core</h3>
+                                    </div>
+                                    <p className="text-xl font-bold text-slate-800 dark:text-slate-200 leading-relaxed italic border-l-4 border-slate-100 dark:border-slate-800 pl-6">
+                                        "{report.executiveSummary}"
+                                    </p>
+                                </section>
+
+                                {/* 2. Key Trends Analysis */}
+                                <section>
+                                    <div className="flex items-center gap-2 mb-8">
+                                        <div className="w-1 h-4 bg-emerald-500 rounded-full" />
+                                        <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Market Vector Analysis</h3>
+                                    </div>
+                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                        {report.keyTrends.map((trend, i) => (
+                                            <div key={i} className="group p-6 rounded-[32px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-white/5 hover:border-blue-500/30 transition-all duration-500">
+                                                <div className="flex items-start gap-4 mb-4">
+                                                    <div className="p-3 bg-white dark:bg-slate-900 rounded-xl shadow-sm group-hover:bg-blue-500 group-hover:text-white transition-all duration-500">
+                                                        <TrendingUp size={18} />
+                                                    </div>
+                                                    <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">{trend.trend}</h4>
+                                                </div>
+                                                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                                                    {trend.detail}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+
+                                {/* 3. Actionable Directives */}
+                                <section>
+                                    <div className="flex items-center gap-2 mb-8">
+                                        <div className="w-1 h-4 bg-amber-500 rounded-full" />
+                                        <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Execution Directives</h3>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {report.actionableRecommendations.map((rec, i) => (
+                                            <div key={i} className="flex gap-4 p-5 bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm group hover:scale-[1.01] transition-transform">
+                                                <div className="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg h-fit group-hover:bg-emerald-500/10 transition-colors">
+                                                    <CheckCircle2 className="text-emerald-500" size={16} />
+                                                </div>
+                                                <p className="text-[13px] font-bold text-slate-700 dark:text-slate-300 leading-snug">
+                                                    {rec}
+                                                </p>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </section>
+                            </div>
+                        </div>
+
+                        {/* Intelligence Footer */}
+                        <div className="px-8 py-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 flex flex-col md:flex-row justify-between items-center gap-4">
+                            <div className="flex items-center gap-3">
+                                <Cpu size={14} className="text-blue-500" />
+                                <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{report.briefingFooter}</span>
+                            </div>
+                            <div className="flex gap-6 no-print">
+                                <button onClick={handleDownloadPDF} className="text-[10px] font-black text-slate-400 hover:text-blue-500 uppercase tracking-widest transition-colors">Download PDF</button>
+                                <button onClick={handleSyncIntelligence} className="text-[10px] font-black text-slate-400 hover:text-blue-500 uppercase tracking-widest transition-colors">Sync Intelligence</button>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -470,7 +606,7 @@ const App = () => {
                     </div>
                 </div>
             )}
-            <Footer />
+            <Footer lastUpdatedTs={lastUpdatedTs} />
         </div>
     );
 };

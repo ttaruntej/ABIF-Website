@@ -26,7 +26,7 @@ const Header = ({
 
     return (
         <header className="fixed top-0 left-0 right-0 z-[100] px-4 py-3 pointer-events-none">
-            <div className="max-w-7xl mx-auto flex items-center gap-4 pointer-events-auto bg-white/70 dark:bg-slate-900/40 backdrop-blur-3xl border border-white/20 dark:border-white/5 h-14 rounded-full px-4 shadow-2xl transition-all duration-700">
+            <div className="max-w-7xl mx-auto flex items-center gap-4 pointer-events-auto bg-white/90 dark:bg-slate-900/40 backdrop-blur-3xl border border-slate-200 dark:border-white/5 h-14 rounded-full px-4 shadow-2xl transition-all duration-700">
 
                 {/* Tactical Brand */}
                 <div className="flex items-center gap-3 shrink-0">
@@ -46,7 +46,7 @@ const Header = ({
 
                     {/* Compact Search */}
                     <div className="relative flex-1 min-w-[200px]">
-                        <Search size={14} className={`absolute left-4 top-1/2 -translate-y-1/2 transition-all ${searchQuery ? 'text-blue-500' : 'text-slate-400'}`} />
+                        <Search size={14} className={`absolute left-4 top-1/2 -translate-y-1/2 transition-all ${searchQuery ? 'text-blue-500' : 'text-slate-500'}`} />
                         <input
                             type="text"
                             placeholder={currentView === 'archive' ? "Search archives..." : "Search opportunities..."}

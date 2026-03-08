@@ -79,7 +79,7 @@ const TacticalSpear = ({
                         <button
                             onClick={() => { action.onClick(); if (action.id !== 'theme') setIsOpen(false); }}
                             disabled={action.disabled}
-                            className={`w-14 h-14 rounded-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-3xl border border-white/20 dark:border-white/5 shadow-2xl flex items-center justify-center text-slate-400 transition-all duration-500 ${action.color} ${action.disabled ? 'opacity-30 cursor-not-allowed' : 'active:scale-90 hover:scale-110'}`}
+                            className={`w-14 h-14 rounded-2xl bg-white dark:bg-slate-900/80 backdrop-blur-3xl border border-slate-200 dark:border-white/5 shadow-2xl flex items-center justify-center text-slate-500 dark:text-slate-400 transition-all duration-500 ${action.color} ${action.disabled ? 'opacity-30 cursor-not-allowed' : 'active:scale-90 hover:scale-110'}`}
                             style={{ transitionDelay: `${(actions.length - 1 - idx) * 50}ms` }}
                         >
                             {action.icon}

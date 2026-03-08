@@ -178,6 +178,10 @@ html {
 
 /* Arclight Depth Effects */
 .arclight-gradient {
+    background: radial-gradient(circle at top center, rgba(59, 130, 246, 0.08) 0%, transparent 100%);
+}
+
+.dark .arclight-gradient {
     background: radial-gradient(circle at top center, rgba(30, 41, 59, 0.5) 0%, transparent 100%);
 }
 
@@ -197,4 +201,34 @@ html {
 
 .dark .archive-stamp {
     color: rgba(255, 255, 255, 0.03);
+}
+
+@media print {
+    body * {
+        visibility: hidden !important;
+    }
+
+    #report-modal-content,
+    #report-modal-content * {
+        visibility: visible !important;
+    }
+
+    #report-modal-content {
+        position: absolute !important;
+        left: 0 !important;
+        top: 0 !important;
+        width: 100% !important;
+        padding: 40px !important;
+        background: white !important;
+        color: black !important;
+        box-shadow: none !important;
+        border: none !important;
+        display: block !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+
+    .no-print {
+        display: none !important;
+    }
 }
