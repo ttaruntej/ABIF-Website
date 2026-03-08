@@ -15,7 +15,7 @@ const EcosystemTicker = ({ opportunities, lastUpdatedTs }) => {
         const topSector = Object.entries(sectorCounts).sort((a, b) => b[1] - a[1])[0];
 
         const lastUpdatedText = lastUpdatedTs
-            ? `Cycle Completed: ${new Date(lastUpdatedTs).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+            ? `Cycle Completed: ${new Date(Number(lastUpdatedTs)).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
             : 'Autonomous Search Active';
 
         const items = [

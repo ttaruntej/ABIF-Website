@@ -86,19 +86,19 @@ const MarketVectorChart = ({ opportunities }) => {
                         const x = 100 + r * Math.cos(angle);
                         const y = 100 + r * Math.sin(angle);
 
-                        // Label offset
-                        const lx = 100 + 92 * Math.cos(angle);
-                        const ly = 100 + 92 * Math.sin(angle);
+                        // Optimized Label strategy to prevent clipping
+                        const lx = 100 + 100 * Math.cos(angle);
+                        const ly = 100 + 100 * Math.sin(angle);
 
                         return (
                             <React.Fragment key={i}>
                                 <circle cx={x} cy={y} r="3.5" fill="rgb(59, 130, 246)" className="shadow-lg" />
-                                <foreignObject x={lx - 35} y={ly - 10} width="70" height="20">
+                                <foreignObject x={lx - 45} y={ly - 10} width="90" height="25">
                                     <div className="flex flex-col items-center justify-center leading-none">
-                                        <span className="text-[10px] font-black text-slate-800 dark:text-white uppercase truncate w-full text-center">
-                                            {d.name.split(' ')[0]}
+                                        <span className="text-[9px] font-black text-slate-800 dark:text-white uppercase truncate w-full text-center">
+                                            {d.name}
                                         </span>
-                                        <span className="text-[8px] font-mono font-black text-blue-500 mt-0.5">{d.value}</span>
+                                        <span className="text-[8px] font-mono font-black text-blue-500 mt-1">{d.value}</span>
                                     </div>
                                 </foreignObject>
                             </React.Fragment>
