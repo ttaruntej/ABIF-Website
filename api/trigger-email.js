@@ -1,13 +1,4 @@
 export default async function handler(req, res) {
-    const GH_TOKEN = process.env.GH_TOKEN;
-    const REPO_OWNER = 'ttaruntej';
-    const REPO_NAME = 'ABIF-Funding-Tracker';
-    const WORKFLOW_ID = 'send-email.yml';
-
-    if (!GH_TOKEN) {
-        return res.status(500).json({ error: 'GitHub Token not configured' });
-    }
-
     // Enable CORS for frontend clients (Localhost & GitHub Pages)
     res.setHeader('Access-Control-Allow-Credentials', true)
     res.setHeader('Access-Control-Allow-Origin', '*') // Allow all origins
@@ -19,6 +10,15 @@ export default async function handler(req, res) {
 
     if (req.method === 'OPTIONS') {
         return res.status(200).end()
+    }
+
+    const GH_TOKEN = process.env.GH_TOKEN;
+    const REPO_OWNER = 'ttaruntej';
+    const REPO_NAME = 'ABIF-Funding-Tracker';
+    const WORKFLOW_ID = 'send-email.yml';
+
+    if (!GH_TOKEN) {
+        return res.status(500).json({ error: 'GitHub Token not configured' });
     }
 
     const headers = {
