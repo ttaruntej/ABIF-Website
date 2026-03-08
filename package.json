@@ -10,7 +10,8 @@
         "preview": "vite preview",
         "predeploy": "npm run build",
         "deploy": "gh-pages -d dist",
-        "scrape:deep": "node scripts/deep-scraper.js"
+        "scrape:discovery": "node scripts/notebook-agent.js",
+        "scrape:integrity": "node scripts/integrity-guard.js"
     },
     "dependencies": {
         "@google/generative-ai": "^0.24.1",
