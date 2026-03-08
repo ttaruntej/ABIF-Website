@@ -285,6 +285,16 @@ const App = () => {
         return "Synthesizing Intelligence...";
     };
 
+    const clearFilters = () => {
+        setSearchQuery('');
+        setActiveCategory('all');
+        setActiveSector('All Sectors');
+        setActiveStatus('all');
+        addLog('Global Filters Reset', 'info');
+    };
+
+    const isFiltered = searchQuery !== '' || activeCategory !== 'all' || activeSector !== 'All Sectors' || activeStatus !== 'all';
+
     // 4. Dynamic Insights & Stats Calculation
     const { filtered, catCounts, activeStats, availableSectors, dynamicSentiment } = useMemo(() => {
         // Base matching logic
@@ -427,6 +437,8 @@ const App = () => {
                         availableSectors={availableSectors}
                         activeStatus={activeStatus} setActiveStatus={setActiveStatus}
                         currentView={currentView}
+                        isFiltered={isFiltered}
+                        onClearFilters={clearFilters}
                     />
                 </div>
 
