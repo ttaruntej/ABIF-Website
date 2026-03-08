@@ -13,6 +13,7 @@ import SchemeCard from './components/SchemeCard';
 import EmptyState from './components/EmptyState';
 import Footer from './components/Footer';
 import TacticalSpear from './components/TacticalSpear';
+import EcosystemTicker from './components/EcosystemTicker';
 import { Activity, X, TrendingUp, CheckCircle2, Cpu } from 'lucide-react';
 
 const App = () => {
@@ -399,6 +400,7 @@ const App = () => {
                     </div>
                 </div>
             )}
+            <EcosystemTicker opportunities={opportunities} lastUpdatedTs={lastUpdatedTs} />
 
             <Header
                 currentView={currentView}

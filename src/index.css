@@ -154,6 +154,25 @@ html {
     scrollbar-width: none;
 }
 
+/* Strategic Intel Ticker Animation */
+.animate-ticker {
+    animation: ticker-scroll 60s linear infinite;
+}
+
+.animate-ticker:hover {
+    animation-play-state: paused;
+}
+
+@keyframes ticker-scroll {
+    0% {
+        transform: translateX(100vw);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
+
 /* Arclight Depth Effects */
 .arclight-gradient {
     background: radial-gradient(circle at top center, rgba(59, 130, 246, 0.08) 0%, transparent 100%);
