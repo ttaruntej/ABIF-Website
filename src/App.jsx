@@ -484,7 +484,7 @@ const App = () => {
 
             {showReport && report && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
-                    <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-md animate-in fade-in" onClick={() => setShowReport(false)}></div>
+                    <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-md animate-in fade-in no-print" onClick={() => setShowReport(false)}></div>
                     <div id="report-modal-content" className="relative w-full max-w-5xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-[40px] overflow-hidden shadow-2xl animate-shutter flex flex-col max-h-[90vh]">
                         {/* Intelligence Header */}
                         <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/50">
@@ -502,7 +502,7 @@ const App = () => {
                                     </div>
                                 </div>
                             </div>
-                            <button onClick={() => setShowReport(false)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/5 text-slate-400 hover:text-red-500 transition-all active:scale-90">
+                            <button onClick={() => setShowReport(false)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/5 text-slate-400 hover:text-red-500 transition-all active:scale-90 no-print">
                                 <X size={24} />
                             </button>
                         </div>
@@ -571,11 +571,11 @@ const App = () => {
                         <div className="px-8 py-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 flex flex-col md:flex-row justify-between items-center gap-4">
                             <div className="flex items-center gap-3">
                                 <Cpu size={14} className="text-blue-500" />
-                                <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{report.briefingFooter}</span>
+                                <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{report.briefingFooter?.replace(/\s*\(Powered by Gemini 2\.5 Flash\)\s*/gi, '')}</span>
                             </div>
                             <div className="flex gap-6 no-print">
-                                <button onClick={handleDownloadPDF} className="text-[10px] font-black text-slate-400 hover:text-blue-500 uppercase tracking-widest transition-colors">Download PDF</button>
-                                <button onClick={handleSyncIntelligence} className="text-[10px] font-black text-slate-400 hover:text-blue-500 uppercase tracking-widest transition-colors">Sync Intelligence</button>
+                                <button onClick={handleDownloadPDF} className="text-[10px] font-black text-slate-400 hover:text-blue-500 uppercase tracking-widest transition-colors cursor-pointer">Download PDF</button>
+                                <button onClick={handleSyncIntelligence} className="text-[10px] font-black text-slate-400 hover:text-blue-500 uppercase tracking-widest transition-colors cursor-pointer">Sync Intelligence</button>
                             </div>
                         </div>
                     </div>

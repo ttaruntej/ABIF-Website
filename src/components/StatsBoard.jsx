@@ -86,7 +86,7 @@ const StatsBoard = ({ stats, marketSentiment, onReportClick }) => {
                             <div className="h-6 w-px bg-white/10 dark:bg-slate-950/10" />
                             <button
                                 onClick={onReportClick}
-                                className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-blue-400 hover:text-blue-300 ml-auto"
+                                className="flex items-center gap-2 text-[9px] font-black uppercase tracking-widest text-blue-400 hover:text-blue-300 ml-auto cursor-pointer"
                             >
                                 <FileText size={12} />
                                 Full Report
