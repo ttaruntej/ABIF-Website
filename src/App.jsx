@@ -17,6 +17,7 @@ import CategoryNav from './components/CategoryNav';
 import SchemeCard from './components/SchemeCard';
 import EmptyState from './components/EmptyState';
 import Footer from './components/Footer';
+import FeedbackSection from './components/FeedbackSection';
 import TacticalSpear from './components/TacticalSpear';
 import EcosystemTicker from './components/EcosystemTicker';
 import { Activity, X, TrendingUp, CheckCircle2, Cpu } from 'lucide-react';
@@ -411,6 +412,7 @@ const App = () => {
                     </div>
                 </div>
             )}
+            <FeedbackSection addLog={addLog} />
             <Footer lastUpdatedTs={lastUpdatedTs} />
         </div>
     );
