@@ -71,61 +71,81 @@ export const useEcosystemData = () => {
 
     // Derived State
     const { filtered, catCounts, activeStats, availableSectors, dynamicSentiment } = useMemo(() => {
-        const matches = (o, filters = {}) => {
-            const {
-                audience = activeAudience,
-                category = activeCategory,
-                sector = activeSector,
-                status = activeStatus,
-                search = searchQuery,
-                view = currentView
-            } = filters;
-
-            const matchesAudience = audience === 'all' || (o.targetAudience || []).includes(audience);
-            const matchesCategory = category === 'all' || (o.category || '').toLowerCase() === category;
-            const matchesSector = sector === 'All Sectors' || (o.sectors || []).includes(sector);
-            const matchesStatus = status === 'all' ||
-                (status === 'Open' ? ['Open', 'Closing Soon'].includes(o.status) : o.status === status);
-            const matchesSearch = !search ||
-                (o.name || '').toLowerCase().includes(search.toLowerCase()) ||
-                (o.description || '').toLowerCase().includes(search.toLowerCase());
-
+        // Shared Match Logic
+        const getMatchQualifiers = (o) => {
             const isArchive = ['Closed', 'Verify Manually'].includes(o.status);
-            const matchesView = view === 'dashboard' ? !isArchive : isArchive;
+            const matchesView = currentView === 'dashboard' ? !isArchive : isArchive;
+            const matchesAudience = activeAudience === 'all' || (o.targetAudience || []).includes(activeAudience);
+            const matchesSector = activeSector === 'All Sectors' || (o.sectors || []).includes(activeSector);
+            const matchesStatus = activeStatus === 'all' ||
+                (activeStatus === 'Open' ? ['Open', 'Closing Soon'].includes(o.status) : o.status === activeStatus);
+            const matchesSearch = !searchQuery ||
+                (o.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                (o.description || '').toLowerCase().includes(searchQuery.toLowerCase());
 
-            return matchesAudience && matchesCategory && matchesSector && matchesStatus && matchesSearch && matchesView;
+            return { matchesView, matchesAudience, matchesSector, matchesStatus, matchesSearch };
         };
 
-        const filteredResult = opportunities.filter(o => matches(o));
-
+        const result = [];
         const counts = {};
-        CATEGORIES.forEach(c => {
-            counts[c.key] = opportunities.filter(o => matches(o, { category: c.key })).length;
+        CATEGORIES.forEach(c => { counts[c.key] = 0; });
+        const sectorSet = new Set();
+
+        const activeItemsForBriefing = [];
+        let totalActive = 0;
+        let activeOpenCount = 0;
+        let closingSoonCount = 0;
+
+        opportunities.forEach(o => {
+            const q = getMatchQualifiers(o);
+            const oCat = (o.category || '').toLowerCase();
+
+            // 1. Calculate Category Counts (independent of current activeCategory filter)
+            if (q.matchesView && q.matchesAudience && q.matchesSector && q.matchesStatus && q.matchesSearch) {
+                if (counts.hasOwnProperty(oCat)) {
+                    counts[oCat]++;
+                }
+            }
+
+            // 2. Primary Filtered Result
+            if (q.matchesView && q.matchesAudience && q.matchesSector && q.matchesStatus && q.matchesSearch &&
+                (activeCategory === 'all' || oCat === activeCategory)) {
+                result.push(o);
+            }
+
+            // 3. Overall Dashboard Stats (independent of many filters)
+            const isArchive = ['Closed', 'Verify Manually'].includes(o.status);
+            if (!isArchive) {
+                totalActive++;
+                if (['Open', 'Rolling', 'Closing Soon'].includes(o.status)) {
+                    activeOpenCount++;
+                    activeItemsForBriefing.push(o);
+                }
+                if (o.status === 'Closing Soon') closingSoonCount++;
+            }
+
+            // 4. Available Sectors
+            if (q.matchesView) {
+                (o.sectors || []).forEach(s => sectorSet.add(s));
+            }
         });
 
-        const activeItems = opportunities.filter(o => matches(o, { status: 'all', view: 'dashboard' }));
         const statsObj = {
-            total: activeItems.length,
-            active: activeItems.filter(o => ['Open', 'Rolling', 'Closing Soon'].includes(o.status)).length,
-            closingSoon: activeItems.filter(o => o.status === 'Closing Soon').length,
-            briefing: generateBriefing(activeItems)
+            total: totalActive,
+            active: activeOpenCount,
+            closingSoon: closingSoonCount,
+            briefing: generateBriefing(activeItemsForBriefing)
         };
-
-        const sectors = Array.from(new Set(
-            opportunities
-                .filter(o => matches(o, { sector: 'All Sectors' }))
-                .flatMap(o => o.sectors || [])
-        )).sort();
 
         const sentiment = (statsObj.active / (statsObj.total || 1)) > 0.5
             ? { label: 'Aggressive / Bullish', color: 'text-emerald-400', bg: 'bg-emerald-500/10' }
             : { label: 'Transition / Stable', color: 'text-blue-400', bg: 'bg-blue-500/10' };
 
         return {
-            filtered: filteredResult,
+            filtered: result,
             catCounts: counts,
             activeStats: statsObj,
-            availableSectors: sectors,
+            availableSectors: Array.from(sectorSet).sort(),
             dynamicSentiment: sentiment
         };
     }, [opportunities, activeAudience, activeCategory, activeSector, activeStatus, searchQuery, currentView]);
