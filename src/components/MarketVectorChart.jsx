@@ -48,13 +48,13 @@ const MarketVectorChart = ({ opportunities }) => {
 
             {/* Strategic Radar Visualization (High-Tech SVG) */}
             <div className="flex-1 flex items-center justify-center relative min-h-[220px]">
-                <svg viewBox="0 0 200 200" className="w-full h-full max-w-[200px] drop-shadow-[0_0_20px_rgba(59,130,246,0.3)]">
+                <svg viewBox="0 0 360 360" className="w-full h-full max-w-[280px] drop-shadow-[0_0_20px_rgba(59,130,246,0.3)]">
                     {/* Background Grid Rings */}
                     {[0.25, 0.5, 0.75, 1].map((r, i) => (
                         <circle
                             key={i}
-                            cx="100" cy="100"
-                            r={75 * r}
+                            cx="180" cy="180"
+                            r={100 * r}
                             fill="none"
                             stroke="currentColor"
                             strokeWidth="1"
@@ -65,12 +65,12 @@ const MarketVectorChart = ({ opportunities }) => {
                     {/* Grid Lines */}
                     {chartData.map((_, i) => {
                         const angle = (i * 2 * Math.PI) / chartData.length;
-                        const x = 100 + 75 * Math.cos(angle);
-                        const y = 100 + 75 * Math.sin(angle);
+                        const x = 180 + 100 * Math.cos(angle);
+                        const y = 180 + 100 * Math.sin(angle);
                         return (
                             <line
                                 key={i}
-                                x1="100" y1="100"
+                                x1="180" y1="180"
                                 x2={x} y2={y}
                                 stroke="currentColor"
                                 strokeWidth="1"
@@ -82,23 +82,23 @@ const MarketVectorChart = ({ opportunities }) => {
                     {/* Data Points & Label Positions */}
                     {chartData.map((d, i) => {
                         const angle = (i * 2 * Math.PI) / chartData.length;
-                        const r = (d.value / maxValue) * 75;
-                        const x = 100 + r * Math.cos(angle);
-                        const y = 100 + r * Math.sin(angle);
+                        const r = (d.value / maxValue) * 100;
+                        const x = 180 + r * Math.cos(angle);
+                        const y = 180 + r * Math.sin(angle);
 
-                        // Advanced Label Strategy: No fixed width to prevent clipping
-                        const lx = 100 + 105 * Math.cos(angle);
-                        const ly = 100 + 105 * Math.sin(angle);
+                        // Position labels further out
+                        const lx = 180 + 135 * Math.cos(angle);
+                        const ly = 180 + 135 * Math.sin(angle);
 
                         return (
                             <React.Fragment key={i}>
-                                <circle cx={x} cy={y} r="3.5" fill="rgb(59, 130, 246)" className="shadow-lg" />
-                                <foreignObject x={lx - 60} y={ly - 10} width="120" height="30">
+                                <circle cx={x} cy={y} r="4" fill="rgb(59, 130, 246)" className="shadow-lg" />
+                                <foreignObject x={lx - 60} y={ly - 20} width="120" height="40">
                                     <div className="flex flex-col items-center justify-center leading-tight">
-                                        <span className="text-[9px] font-black text-slate-800 dark:text-white uppercase w-full text-center drop-shadow-sm px-1">
+                                        <span className="text-[10px] font-black text-slate-800 dark:text-white uppercase w-full text-center drop-shadow-sm px-1 whitespace-nowrap overflow-hidden text-ellipsis">
                                             {d.name}
                                         </span>
-                                        <span className="text-[8px] font-mono font-black text-blue-500 mt-1">{d.value}</span>
+                                        <span className="text-[9px] font-mono font-black text-blue-500 mt-1">{d.value}</span>
                                     </div>
                                 </foreignObject>
                             </React.Fragment>
@@ -109,19 +109,20 @@ const MarketVectorChart = ({ opportunities }) => {
                     <path
                         d={chartData.map((d, i) => {
                             const angle = (i * 2 * Math.PI) / chartData.length;
-                            const r = (d.value / maxValue) * 75;
-                            const x = 100 + r * Math.cos(angle);
-                            const y = 100 + r * Math.sin(angle);
+                            const r = (d.value / maxValue) * 100;
+                            const x = 180 + r * Math.cos(angle);
+                            const y = 180 + r * Math.sin(angle);
                             return `${i === 0 ? 'M' : 'L'} ${x} ${y}`;
                         }).join(' ') + ' Z'}
                         fill="url(#radarGradient)"
                         stroke="rgb(59, 130, 246)"
                         strokeWidth="3"
+                        strokeLinejoin="round"
                         className="animate-pulse"
                     />
 
                     <defs>
-                        <radialGradient id="radarGradient" cx="100" cy="100" r="75" gradientUnits="userSpaceOnUse">
+                        <radialGradient id="radarGradient" cx="180" cy="180" r="100" gradientUnits="userSpaceOnUse">
                             <stop offset="0%" stopColor="rgba(59, 130, 246, 0.4)" />
                             <stop offset="100%" stopColor="rgba(59, 130, 246, 0.7)" />
                         </radialGradient>
