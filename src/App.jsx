@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import './index.css';
 
 import { exportToCSV } from './utils/csvExporter';
@@ -20,7 +20,10 @@ import Footer from './components/Footer';
 import FeedbackSection from './components/FeedbackSection';
 import TacticalSpear from './components/TacticalSpear';
 import EcosystemTicker from './components/EcosystemTicker';
+import LazyGrid from './components/LazyGrid';
 import { Activity, X, TrendingUp, CheckCircle2, Cpu } from 'lucide-react';
+
+const IntelligenceReport = lazy(() => import('./components/IntelligenceReport'));
 
 const App = () => {
     // 1. Theme setup
@@ -219,11 +222,17 @@ const App = () => {
                         <div className="space-y-12">
                             {visibleSections.map(section => (
                                 <div key={section.key} id={section.key} ref={el => { sectionRefs.current[section.key] = el; }} className="scroll-mt-40 animate-in">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                        {section.items.map((scheme, i) => (
-                                            <SchemeCard key={`${section.key}-${i}`} scheme={scheme} showCategoryBadge={activeCategory === 'all'} isArchivedMode={currentView === 'archive'} />
-                                        ))}
-                                    </div>
+                                    {visibleSections.length > 1 && (
+                                        <div className="flex items-center gap-3 mb-8">
+                                            <div className={`w-1 h-3 rounded-full ${section.borderColor.replace('border-', 'bg-')}`} />
+                                            <h3 className="text-[12px] font-black uppercase tracking-[0.3em] text-slate-400">{section.label}</h3>
+                                        </div>
+                                    )}
+                                    <LazyGrid
+                                        items={section.items}
+                                        showCategoryBadge={activeCategory === 'all'}
+                                        isArchivedMode={currentView === 'archive'}
+                                    />
                                 </div>
                             ))}
                         </div>
@@ -333,124 +342,15 @@ const App = () => {
             )}
 
             {showReport && report && (
-                <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 print-report-active">
-                    <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-md animate-in fade-in no-print" onClick={() => setShowReport(false)}></div>
-                    <div id="report-modal-content" className="relative w-full max-w-5xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-white/5 rounded-[40px] overflow-hidden shadow-2xl animate-shutter flex flex-col max-h-[90vh]">
-                        <div className="p-8 border-b border-slate-100 dark:border-slate-800 flex justify-between items-center bg-slate-50 dark:bg-slate-950/50">
-                            <div className="flex items-center gap-4">
-                                <div className="p-3 bg-blue-500 rounded-2xl shadow-[0_0_20px_rgba(59,130,246,0.5)]">
-                                    <Activity className="text-white" size={24} />
-                                </div>
-                                <div className="flex flex-col">
-                                    <h2 className="text-2xl font-black text-slate-900 dark:text-white tracking-tighter uppercase italic leading-none">{report.title}</h2>
-                                    <div className="flex items-center gap-2 mt-2">
-                                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Autonomous Research Cycle</span>
-                                        <div className="px-2 py-0.5 bg-slate-200 dark:bg-slate-800 rounded-md text-[9px] font-bold text-slate-600 dark:text-slate-400">
-                                            {new Date(report.generatedAt).toLocaleDateString()} • {new Date(report.generatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <button onClick={() => setShowReport(false)} className="w-12 h-12 flex items-center justify-center rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-white/5 text-slate-400 hover:text-red-500 transition-all active:scale-90 no-print">
-                                <X size={24} />
-                            </button>
-                        </div>
-
-                        <div className="flex-1 overflow-y-auto custom-scrollbar p-8">
-                            <div className="hidden print:block mb-12 border-b-2 border-slate-900 pb-8">
-                                <div className="flex justify-between items-start">
-                                    <div className="flex items-center gap-6">
-                                        <img src="https://abif.iitkgp.ac.in/logos/logo.png" alt="ABIF Logo" className="w-20 h-20 object-contain" />
-                                        <div>
-                                            <h1 className="text-3xl font-black text-slate-950 uppercase tracking-tighter">Agri-Business Incubation Centre</h1>
-                                            <p className="text-sm font-bold text-slate-600 uppercase tracking-widest">IIT Kharagpur • Strategic Funding Intelligence</p>
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-2">Report Serial</p>
-                                        <p className="text-sm font-black text-slate-900 tracking-tighter">#{new Date(report.generatedAt).getTime().toString().slice(-6)}</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="max-w-4xl mx-auto space-y-12 pb-8">
-                                <section>
-                                    <div className="flex items-center gap-2 mb-6">
-                                        <div className="w-1 h-4 bg-blue-500 rounded-full" />
-                                        <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Strategic Core</h3>
-                                    </div>
-                                    <p className="text-xl font-bold text-slate-800 dark:text-slate-200 leading-relaxed italic border-l-4 border-slate-100 dark:border-slate-800 pl-6">
-                                        "{report.executiveSummary}"
-                                    </p>
-                                </section>
-
-                                <section>
-                                    <div className="flex items-center gap-2 mb-8">
-                                        <div className="w-1 h-4 bg-emerald-500 rounded-full" />
-                                        <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Market Vector Analysis</h3>
-                                    </div>
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                        {report.keyTrends.map((trend, i) => (
-                                            <div key={i} className="group p-6 rounded-[32px] bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-white/5 hover:border-blue-500/30 transition-all duration-500">
-                                                <div className="flex items-start gap-4 mb-4">
-                                                    <div className="p-3 bg-white dark:bg-slate-900 rounded-xl shadow-sm group-hover:bg-blue-500 group-hover:text-white transition-all duration-500">
-                                                        <TrendingUp size={18} />
-                                                    </div>
-                                                    <h4 className="text-sm font-black text-slate-900 dark:text-white uppercase tracking-tight">{trend.trend}</h4>
-                                                </div>
-                                                <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
-                                                    {trend.detail}
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </section>
-
-                                <section>
-                                    <div className="flex items-center gap-2 mb-8">
-                                        <div className="w-1 h-4 bg-amber-500 rounded-full" />
-                                        <h3 className="text-[11px] font-black text-slate-400 uppercase tracking-[0.3em]">Execution Directives</h3>
-                                    </div>
-                                    <div className="space-y-4">
-                                        {report.actionableRecommendations.map((rec, i) => (
-                                            <div key={i} className="flex gap-4 p-5 bg-white dark:bg-slate-900/50 rounded-2xl border border-slate-100 dark:border-white/5 shadow-sm group hover:scale-[1.01] transition-transform">
-                                                <div className="p-2 bg-slate-50 dark:bg-slate-800 rounded-lg h-fit group-hover:bg-emerald-500/10 transition-colors">
-                                                    <CheckCircle2 className="text-emerald-500" size={16} />
-                                                </div>
-                                                <p className="text-[13px] font-bold text-slate-700 dark:text-slate-300 leading-snug">
-                                                    {rec}
-                                                </p>
-                                            </div>
-                                        ))}
-                                    </div>
-                                </section>
-
-                                <div className="hidden print:block pt-12 border-t border-slate-200 mt-12">
-                                    <p className="text-[9px] font-bold text-slate-400 leading-relaxed italic">
-                                        Disclaimer: This intelligence report is synthesized by the ABIF Neural Engine for strategic informational purposes. Real-time verification with original funder mandates is mandatory before capital engagement. All data corresponds to the research cycle recorded at the time of generation.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className="px-8 py-6 border-t border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-950/50 flex flex-col md:flex-row justify-between items-center gap-4">
-                            <div className="flex items-center gap-3">
-                                <Cpu size={14} className="text-blue-500" />
-                                <span className="text-[10px] font-black text-slate-500 dark:text-slate-400 uppercase tracking-widest">{report.briefingFooter?.replace(/\s*\(Powered by Gemini 2\.5 Flash\)\s*/gi, '')}</span>
-                            </div>
-                            <div className="flex gap-6 no-print">
-                                <button onClick={handleDownloadPDF} className="text-[10px] font-black text-slate-400 hover:text-blue-500 uppercase tracking-widest transition-colors cursor-pointer">Download PDF</button>
-                                <button
-                                    onClick={handleSyncIntelligence}
-                                    disabled={isSyncingReport}
-                                    className={`text-[10px] font-black uppercase tracking-widest transition-all cursor-pointer ${isSyncingReport ? 'text-blue-500 animate-pulse' : 'text-slate-400 hover:text-blue-500'}`}
-                                >
-                                    {isSyncingReport ? 'Syncing...' : 'Sync Intelligence'}
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+                <Suspense fallback={null}>
+                    <IntelligenceReport
+                        report={report}
+                        onClose={() => setShowReport(false)}
+                        onDownloadPDF={handleDownloadPDF}
+                        onSyncIntelligence={handleSyncIntelligence}
+                        isSyncingReport={isSyncingReport}
+                    />
+                </Suspense>
             )}
 
             {showFloatingBar && currentView === 'dashboard' && (

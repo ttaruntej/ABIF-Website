@@ -24,6 +24,20 @@ const Header = ({
         }
     };
 
+    const [localSearch, setLocalSearch] = React.useState(searchQuery);
+
+    React.useEffect(() => {
+        const timer = setTimeout(() => {
+            setSearchQuery(localSearch);
+        }, 300);
+        return () => clearTimeout(timer);
+    }, [localSearch, setSearchQuery]);
+
+    // Sync local search with global search (e.g. when filters are cleared)
+    React.useEffect(() => {
+        setLocalSearch(searchQuery);
+    }, [searchQuery]);
+
     return (
         <header className="fixed top-9 left-0 right-0 z-[100] px-2 sm:px-4 py-0 pointer-events-none mt-2">
             <div className="max-w-7xl mx-auto flex items-center gap-2 sm:gap-4 pointer-events-auto bg-white/90 dark:bg-slate-900/40 backdrop-blur-3xl border border-slate-200 dark:border-white/5 h-14 rounded-full px-3 sm:px-4 shadow-2xl transition-all duration-700">
@@ -46,12 +60,12 @@ const Header = ({
 
                     {/* Compact Search */}
                     <div className="relative flex-1 min-w-[120px] sm:min-w-[200px]">
-                        <Search size={14} className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 transition-all ${searchQuery ? 'text-blue-500' : 'text-slate-500'}`} />
+                        <Search size={14} className={`absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 transition-all ${localSearch ? 'text-blue-500' : 'text-slate-500'}`} />
                         <input
                             type="text"
                             placeholder={currentView === 'archive' ? "Search..." : "Find..."}
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
+                            value={localSearch}
+                            onChange={(e) => setLocalSearch(e.target.value)}
                             className="w-full h-9 bg-slate-100/50 dark:bg-slate-800/50 border border-transparent focus:border-blue-500/20 rounded-xl pl-8 sm:pl-10 pr-2 sm:pr-4 text-[11px] sm:text-[12px] font-bold text-slate-950 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-600 transition-all outline-none"
                         />
                     </div>

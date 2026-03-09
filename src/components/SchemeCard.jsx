@@ -2,7 +2,7 @@ import React from 'react';
 import { CATEGORIES, STATUS_COLORS } from '../constants/tracker';
 import { ExternalLink, ShieldCheck, AlertTriangle, Target, DollarSign, Calendar, Lock } from 'lucide-react';
 
-const SchemeCard = ({ scheme, showCategoryBadge, isArchivedMode }) => {
+const SchemeCard = React.memo(({ scheme, showCategoryBadge, isArchivedMode }) => {
     const isVerified = scheme.linkStatus === 'verified';
     const isProbable = scheme.linkStatus === 'probable';
     const isArchived = scheme.status === 'Closed' || scheme.status === 'Verify Manually' || isArchivedMode;
@@ -152,6 +152,6 @@ const SchemeCard = ({ scheme, showCategoryBadge, isArchivedMode }) => {
             )}
         </div>
     );
-};
+});
 
 export default SchemeCard;

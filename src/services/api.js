@@ -5,7 +5,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://abif-funding-
  */
 export const fetchOpportunities = async () => {
     try {
-        const res = await fetch(`./data/opportunities.json?v=${Date.now()}`);
+        const res = await fetch(`./data/opportunities.json`);
         if (!res.ok) throw new Error(`JSON FETCH FAILED: ${res.status}`);
         return await res.json();
     } catch (err) {
@@ -16,7 +16,7 @@ export const fetchOpportunities = async () => {
 
 export const fetchResearchReport = async () => {
     try {
-        const res = await fetch(`./data/research_report.json?v=${Date.now()}`);
+        const res = await fetch(`./data/research_report.json`);
         if (!res.ok) throw new Error(`REPORT FETCH FAILED: ${res.status}`);
         return await res.json();
     } catch (err) {
@@ -28,11 +28,11 @@ export const fetchResearchReport = async () => {
 export const fetchDispatchMeta = async () => {
     try {
         // High-Priority: Fetch Live Meta from Proxy (Bypasses GH Pages Build Lag)
-        const res = await fetch(`${API_BASE_URL}/api/trigger-email?action=fetch_meta&v=${Date.now()}`);
+        const res = await fetch(`${API_BASE_URL}/api/trigger-email?action=fetch_meta`);
         if (res.ok) return await res.json();
 
         // Fallback: Fetch from Static JSON (May be delayed by 2-3 mins)
-        const staticRes = await fetch(`./data/last_dispatch_meta.json?v=${Date.now()}`);
+        const staticRes = await fetch(`./data/last_dispatch_meta.json`);
         if (staticRes.ok) return await staticRes.json();
 
         return null;
