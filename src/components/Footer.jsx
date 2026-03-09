@@ -148,8 +148,9 @@ const Footer = ({ lastUpdatedTs }) => {
                         <div className="p-2 bg-slate-900 dark:bg-white rounded-lg">
                             <Cpu size={12} className="text-white dark:text-slate-900" />
                         </div>
-                        <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">
-                            &copy; {currentYear} ABIF IIT KHARAGPUR. ASSET OF TBI ECOSYSTEM.
+                        <p className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest leading-relaxed">
+                            &copy; {currentYear} Agri Business Incubation Foundation IIT Kharagpur (ABIF).<br />
+                            Strategic Asset of the TBI Ecosystem.
                         </p>
                     </div>
 

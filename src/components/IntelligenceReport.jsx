@@ -40,7 +40,7 @@ const IntelligenceReport = ({
                             <div className="flex items-center gap-6">
                                 <img src="/logos/abif-logo.png" alt="ABIF Logo" className="w-20 h-20 object-contain" />
                                 <div>
-                                    <h1 className="text-3xl font-black text-slate-950 uppercase tracking-tighter">Agri-Business Incubation Centre</h1>
+                                    <h1 className="text-3xl font-black text-slate-950 uppercase tracking-tighter">Agri Business Incubation Foundation</h1>
                                     <p className="text-sm font-bold text-slate-600 uppercase tracking-widest">IIT Kharagpur • Strategic Funding Intelligence</p>
                                 </div>
                             </div>
@@ -105,7 +105,7 @@ const IntelligenceReport = ({
 
                         <div className="hidden print:block pt-12 border-t border-slate-200 mt-12">
                             <p className="text-[9px] font-bold text-slate-400 leading-relaxed italic">
-                                Disclaimer: This intelligence report is synthesized by the ABIF Neural Engine for strategic informational purposes. Real-time verification with original funder mandates is mandatory before capital engagement. All data corresponds to the research cycle recorded at the time of generation.
+                                Disclaimer: This intelligence report is synthesized by the ABIF IIT Kharagpur Neural Engine for strategic informational purposes. Real-time verification with original funder mandates is mandatory before capital engagement. All data corresponds to the research cycle recorded at the time of generation.
                             </p>
                         </div>
                     </div>

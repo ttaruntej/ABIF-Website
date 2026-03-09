@@ -55,7 +55,7 @@ const FeedbackSection = ({ addLog }) => {
                             Help us refine the <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-emerald-500 italic">Strategic Radar.</span>
                         </h2>
                         <p className="text-sm md:text-base font-medium text-slate-600 dark:text-slate-400 max-w-md leading-relaxed">
-                            Have a suggestion for a new funding source or a feature request? Your feedback directly reaches the TBI Management team at ABIF IIT Kharagpur.
+                            Have a suggestion for a new funding source or a feature request? Your feedback directly reaches the TBI Management team at Agri Business Incubation Foundation (ABIF) IIT Kharagpur.
                         </p>
                     </div>
 
@@ -82,10 +82,10 @@ const FeedbackSection = ({ addLog }) => {
                             type="submit"
                             disabled={status === 'sending' || status === 'success'}
                             className={`w-full group flex items-center justify-center gap-3 py-5 rounded-2xl font-black text-[12px] uppercase tracking-widest transition-all duration-500 ${status === 'success'
-                                    ? 'bg-emerald-500 text-white shadow-[0_0_30px_rgba(16,185,129,0.3)]'
-                                    : status === 'error'
-                                        ? 'bg-red-500 text-white'
-                                        : 'bg-slate-950 dark:bg-white text-white dark:text-slate-950 hover:bg-blue-600 dark:hover:bg-blue-500 dark:hover:text-white shadow-xl hover:shadow-blue-500/20 active:scale-95'
+                                ? 'bg-emerald-500 text-white shadow-[0_0_30px_rgba(16,185,129,0.3)]'
+                                : status === 'error'
+                                    ? 'bg-red-500 text-white'
+                                    : 'bg-slate-950 dark:bg-white text-white dark:text-slate-950 hover:bg-blue-600 dark:hover:bg-blue-500 dark:hover:text-white shadow-xl hover:shadow-blue-500/20 active:scale-95'
                                 }`}
                         >
                             {status === 'sending' ? (
