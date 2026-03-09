@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { triggerEmail, getEmailStatus, fetchDispatchMeta } from '../services/api';
+import ReactGA from "react-ga4";
 
 export const useEmailDispatch = (addLog) => {
     const [emailNotification, setEmailNotification] = useState(null);
@@ -50,6 +51,12 @@ export const useEmailDispatch = (addLog) => {
 
             setEmailNotification({ type: 'initializing', message: 'Connecting to Dispatch Proxy...' });
             addLog(`Initiating dispatch relay to stakeholder`, 'info');
+
+            ReactGA.event({
+                category: "Communication",
+                action: "email_dispatch_triggered",
+                label: targetEmails
+            });
 
             let baselineRunId;
             try {

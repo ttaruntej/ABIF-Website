@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { triggerScraper, getScraperStatus } from '../services/api';
+import ReactGA from "react-ga4";
 
 export const useScraperSync = (addLog, loadData) => {
     const [isRefreshing, setIsRefreshing] = useState(false);
@@ -38,6 +39,11 @@ export const useScraperSync = (addLog, loadData) => {
         setSyncStartTime(Date.now());
         setCooldown(60); // Start 60s cooldown
         addLog('Initiating Deep Web Research Sync...', 'info');
+
+        ReactGA.event({
+            category: "Operations",
+            action: "scraper_sync_triggered"
+        });
 
         try {
             await triggerScraper();
