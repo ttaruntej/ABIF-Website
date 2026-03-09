@@ -21,6 +21,8 @@ const TacticalSpear = ({
     emailCooldown,
     theme,
     toggleTheme,
+    lowPerf,
+    setLowPerf,
     currentView,
     setCurrentView
 }) => {
@@ -65,6 +67,13 @@ const TacticalSpear = ({
             label: currentView === 'dashboard' ? 'VIEW ARCHIVES' : 'LIVE MONITOR',
             onClick: () => setCurrentView(currentView === 'dashboard' ? 'archive' : 'dashboard'),
             color: 'hover:text-purple-500 hover:bg-purple-500/10'
+        },
+        {
+            id: 'perf',
+            icon: <Zap size={20} className={lowPerf ? 'text-amber-500' : ''} />,
+            label: lowPerf ? 'HIGH PERFORMANCE' : 'SAVE GPU (LOW-END)',
+            onClick: () => setLowPerf(!lowPerf),
+            color: 'hover:text-orange-500 hover:bg-orange-500/10'
         }
     ];
 
