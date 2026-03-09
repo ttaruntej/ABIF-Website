@@ -6,7 +6,7 @@ import ReactGA from "react-ga4";
 
 // Initialize GA4 with a placeholder ID. 
 // Replace 'G-XXXXXXXXXX' with your actual Measurement ID from Google Analytics.
-ReactGA.initialize("G-09X0WLYX7Q");
+ReactGA.initialize("G-03BZC683SZ");
 
 const Root = () => {
     useEffect(() => {
