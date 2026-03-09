@@ -208,9 +208,22 @@ async function sendEmail() {
         });
         console.log(`  ✓ Email sent successfully to: ${recipients} (ID: ${info.messageId})`);
 
-        // --- PERSISTENCE: Save current batch to history ---
+        // --- PERSISTENCE: Save current batch and metadata to history ---
+        const dispatchMeta = {
+            timestamp: new Date().toISOString(),
+            recipients: recipients,
+            subject: aiSubject,
+            aiIntro: aiIntro,
+            opportunityCount: incubatorOpps.length,
+            opportunities: incubatorOpps.map(o => o.name)
+        };
+
+        const META_FILE = path.join(process.cwd(), 'public', 'data', 'last_dispatch_meta.json');
+
         fs.writeFileSync(HISTORY_FILE, JSON.stringify(incubatorOpps, null, 2));
-        console.log('  ✓ History updated for next dispatch.');
+        fs.writeFileSync(META_FILE, JSON.stringify(dispatchMeta, null, 2));
+
+        console.log('  ✓ History & Metadata updated for next dispatch.');
 
     } catch (error) {
         console.error('  ✗ Error sending email:', error);

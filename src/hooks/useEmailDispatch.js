@@ -1,14 +1,28 @@
-import { useState } from 'react';
-import { triggerEmail, getEmailStatus } from '../services/api';
+import { useState, useEffect } from 'react';
+import { triggerEmail, getEmailStatus, fetchDispatchMeta } from '../services/api';
 
 export const useEmailDispatch = (addLog) => {
     const [emailNotification, setEmailNotification] = useState(null);
     const [dispatching, setDispatching] = useState(false);
+    const [dispatchMeta, setDispatchMeta] = useState(null);
     const [lastEmailDispatchTs, setLastEmailDispatchTs] = useState(() => {
         try { return localStorage.getItem('lastEmailDispatchTs') || null; } catch (e) { return null; }
     });
 
     const [emailCooldown, setEmailCooldown] = useState(0);
+
+    const loadDispatchMeta = async () => {
+        try {
+            const meta = await fetchDispatchMeta();
+            if (meta) setDispatchMeta(meta);
+        } catch (e) {
+            console.warn('Dispatch meta not available');
+        }
+    };
+
+    useEffect(() => {
+        loadDispatchMeta();
+    }, []);
 
     const handleEmailTrigger = async (targetEmails) => {
         if (dispatching || emailCooldown > 0) return;
@@ -63,6 +77,7 @@ export const useEmailDispatch = (addLog) => {
 
                             setEmailNotification({ type: 'success', message: 'Intelligence briefing dispatched!' });
                             addLog(`Briefing Dispatched successfully`, 'success');
+                            loadDispatchMeta(); // Reload meta after success
                             setTimeout(() => setEmailNotification(null), 8000);
                         }
                     }
@@ -81,6 +96,8 @@ export const useEmailDispatch = (addLog) => {
         dispatching,
         emailCooldown,
         lastEmailDispatchTs,
+        dispatchMeta,
+        loadDispatchMeta,
         handleEmailTrigger
     };
 };

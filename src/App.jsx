@@ -66,6 +66,7 @@ const App = () => {
     const {
         emailNotification,
         emailCooldown,
+        dispatchMeta,
         handleEmailTrigger
     } = useEmailDispatch(addLog);
 
@@ -246,22 +247,87 @@ const App = () => {
             {isEmailModalOpen && (
                 <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-slate-950/60 backdrop-blur-sm animate-in fade-in" onClick={() => setIsEmailModalOpen(false)} />
-                    <div className="relative w-full max-w-sm bg-white dark:bg-slate-900 rounded-[32px] shadow-3xl border border-white/5 p-8 animate-shutter">
-                        <h3 className="font-black text-slate-900 dark:text-white text-[12px] uppercase mb-6 flex items-center gap-3">
-                            Briefing Transmission
-                        </h3>
-                        <input
-                            type="text"
-                            placeholder="Recipient email..."
-                            className="w-full text-sm font-bold bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-blue-500 outline-none text-slate-900 dark:text-white mb-6"
-                            onKeyDown={(e) => { if (e.key === 'Enter') { handleEmailTrigger(e.target.value); setIsEmailModalOpen(false); } }}
-                        />
-                        <button
-                            onClick={() => { const val = document.querySelector('input[placeholder="Recipient email..."]').value; handleEmailTrigger(val); setIsEmailModalOpen(false); }}
-                            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-[10px] uppercase tracking-widest py-4 rounded-xl transition-all"
-                        >
-                            TRANSMIT
-                        </button>
+                    <div className="relative w-full max-w-lg bg-white dark:bg-slate-900 rounded-[32px] shadow-3xl border border-white/5 p-8 animate-shutter">
+                        <div className="flex justify-between items-start mb-6">
+                            <h3 className="font-black text-slate-900 dark:text-white text-[12px] uppercase flex items-center gap-3">
+                                Briefing Transmission
+                            </h3>
+                            <button onClick={() => setIsEmailModalOpen(false)} className="text-slate-400 hover:text-red-500 transition-colors">
+                                <X size={20} />
+                            </button>
+                        </div>
+
+                        {dispatchMeta && (
+                            <div className="mb-6 p-5 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-white/5">
+                                <h4 className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                    <Activity size={12} className="text-emerald-500" />
+                                    Last Active Dispatch
+                                </h4>
+                                <div className="space-y-3">
+                                    <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                                        Subject: <span className="font-medium text-slate-500">{dispatchMeta.subject}</span>
+                                    </p>
+                                    <p className="text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                                        Sent To: <span className="font-medium text-slate-500 truncate block">{dispatchMeta.recipients}</span>
+                                    </p>
+                                    <div className="flex items-center gap-4 mt-2 mb-3">
+                                        <div className="flex flex-col">
+                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Timestamp</span>
+                                            <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400">
+                                                {new Date(dispatchMeta.timestamp).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })}
+                                            </span>
+                                        </div>
+                                        <div className="w-px h-6 bg-slate-200 dark:bg-slate-700" />
+                                        <div className="flex flex-col">
+                                            <span className="text-[9px] font-black text-slate-400 uppercase tracking-tighter">Volume</span>
+                                            <span className="text-[10px] font-bold text-slate-600 dark:text-slate-400">{dispatchMeta.opportunityCount} Mandates</span>
+                                        </div>
+                                    </div>
+                                    <div className="pt-3 border-t border-slate-200 dark:border-slate-800">
+                                        <details className="text-[10px] text-slate-500 cursor-pointer group">
+                                            <summary className="font-black uppercase tracking-widest hover:text-blue-500 transition-colors flex items-center justify-between">
+                                                <span>View AI Sentiment Extract</span>
+                                                <TrendingUp size={10} className="group-open:rotate-180 transition-transform" />
+                                            </summary>
+                                            <div className="mt-3 p-3 bg-white dark:bg-slate-900 rounded-lg italic leading-relaxed text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-white/5" dangerouslySetInnerHTML={{ __html: dispatchMeta.aiIntro }} />
+                                        </details>
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <div className="space-y-4">
+                            <div className="flex justify-between items-center mb-1">
+                                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block ml-1">New Recipient(s)</label>
+                                <span className="text-[10px] font-black text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-full uppercase tracking-tighter">
+                                    {filtered.filter(o => o.targetAudience?.includes('incubator') && o.status !== 'Closed').length} Prospect Mandates
+                                </span>
+                            </div>
+                            <div>
+                                <input
+                                    type="text"
+                                    placeholder="Enter emails separated by commas..."
+                                    className="w-full text-sm font-bold bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-blue-500 outline-none text-slate-900 dark:text-white"
+                                    onKeyDown={(e) => { if (e.key === 'Enter' && e.target.value.trim()) { handleEmailTrigger(e.target.value); setIsEmailModalOpen(false); } }}
+                                />
+                            </div>
+                            <p className="text-[9px] text-slate-400 font-bold uppercase italic px-1">
+                                * This will trigger the AI Agent to perform a fresh delta-analysis and dispatch summaries to the targets above.
+                            </p>
+                            <button
+                                onClick={() => {
+                                    const input = document.querySelector('input[placeholder="Enter emails separated by commas..."]');
+                                    if (input && input.value.trim()) {
+                                        handleEmailTrigger(input.value);
+                                        setIsEmailModalOpen(false);
+                                    }
+                                }}
+                                className="w-full bg-blue-600 hover:bg-blue-700 text-white font-black text-[11px] uppercase tracking-[0.2em] py-5 rounded-2xl transition-all shadow-xl shadow-blue-500/20 active:scale-95 disabled:opacity-50"
+                                disabled={emailCooldown > 0}
+                            >
+                                {emailCooldown > 0 ? `Proxy Locked (${emailCooldown}s)` : 'Initiate Dispatch Relay'}
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}

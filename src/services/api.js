@@ -25,6 +25,17 @@ export const fetchResearchReport = async () => {
     }
 };
 
+export const fetchDispatchMeta = async () => {
+    try {
+        const res = await fetch(`./data/last_dispatch_meta.json?v=${Date.now()}`);
+        if (!res.ok) throw new Error(`META FETCH FAILED: ${res.status}`);
+        return await res.json();
+    } catch (err) {
+        console.warn('ℹ️ No dispatch metadata found yet.');
+        return null;
+    }
+};
+
 /**
  * Trigger & Status for Scraper (Deep Sync)
  */
