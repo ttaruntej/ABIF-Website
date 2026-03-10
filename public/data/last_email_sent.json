@@ -1,165 +1,80 @@
 [
   {
-    "name": "BIRAC–Social Alpha Assistive Tech Quest",
-    "body": "Tata Trusts / BIRAC",
-    "maxAward": "₹25 Lakhs",
-    "deadline": "30-09-2026",
-    "link": "https://birac.nic.in/cfp.php",
-    "description": "Joint programme to discover and scale innovations in assistive technologies for persons with disabilities.",
+    "name": "India Netherlands Hydrogen Fellowship Programme",
+    "body": "DST (MoST)",
+    "maxAward": "Varies",
+    "deadline": "Check website for details",
+    "link": "https://onlinedst.gov.in/Projectproposalformat.aspx?Id=2380",
+    "description": "DST active call for proposals. See the portal for full guidelines and eligibility.",
+    "category": "international",
     "status": "Open",
     "linkStatus": "verified",
-    "category": "csr",
-    "lastScraped": "2026-03-08T06:39:38.900Z",
+    "lastScraped": "2026-03-08T06:39:21.467Z",
+    "dataSource": "scraper:dst",
     "targetAudience": [
-      "incubator",
       "startup"
     ],
     "sectors": [
+      "DeepTech",
+      "Hardware",
       "Agnostic"
-    ],
-    "stages": [
-      "All Stages"
-    ],
-    "criticalEligibility": [
-      "Prototype must be at TRL 4 or higher",
-      "Lead applicant must be a DPIIT-recognized startup",
-      "Previous awardees of BIRAC-Social Alpha cannot apply"
-    ]
-  },
-  {
-    "name": "thingQbator",
-    "body": "NASSCOM Foundation + Cisco CSR",
-    "maxAward": "₹15 Lakhs",
-    "deadline": "Rolling",
-    "link": "https://nasscomfoundation.org/thingqbator/",
-    "description": "IoT-focused incubator by NASSCOM Foundation and Cisco CSR supporting tech-for-good startups.",
-    "status": "Rolling",
-    "linkStatus": "verified",
-    "category": "csr",
-    "lastScraped": "2026-03-08T06:39:53.156Z",
-    "targetAudience": [
-      "incubator",
-      "startup"
-    ],
-    "sectors": [
-      "Agnostic"
-    ],
-    "stages": [
-      "All Stages"
-    ]
-  },
-  {
-    "name": "Krishi Mangal",
-    "body": "Cisco CSR + Social Alpha",
-    "maxAward": "₹10 Lakhs",
-    "deadline": "Rolling",
-    "link": "https://socialalpha.org/krishi-mangal/",
-    "description": "Accelerates agritech innovations for small and marginal farmers through Social Alpha and Cisco.",
-    "status": "Rolling",
-    "linkStatus": "verified",
-    "category": "csr",
-    "lastScraped": "2026-03-08T06:39:54.538Z",
-    "targetAudience": [
-      "incubator",
-      "startup"
-    ],
-    "sectors": [
-      "Agnostic"
-    ],
-    "stages": [
-      "All Stages"
-    ]
-  },
-  {
-    "name": "SBI Foundation – Innovators for Bharat",
-    "body": "SBI Foundation CSR",
-    "maxAward": "₹25 Lakhs",
-    "deadline": "31-05-2026",
-    "link": "https://sbifoundation.in/",
-    "description": "Innovators for Bharat supports social innovators with funding, mentorship, and market linkages.",
-    "status": "Rolling",
-    "linkStatus": "probable",
-    "category": "csr",
-    "lastScraped": "2026-03-08T06:39:29.943Z",
-    "dataSource": "scraper:sbif",
-    "targetAudience": [
-      "incubator",
-      "startup"
-    ],
-    "sectors": [
-      "Social Impact",
-      "EdTech",
-      "HealthTech"
     ],
     "stages": [
       "Seed",
+      "Early Traction",
       "Scale-up"
     ]
   },
   {
-    "name": "India Investment Grid (IIG) – CSR Opportunities Portal",
-    "body": "Invest India / Govt of India",
-    "maxAward": "Varies by Corporate Partner",
+    "name": "Indo-French call by DST-ANR on Applied Mathematics and Artificial Intelligence",
+    "body": "DST (MoST)",
+    "maxAward": "Varies",
+    "deadline": "Check website for details",
+    "link": "https://onlinedst.gov.in/Projectproposalformat.aspx?Id=2381",
+    "description": "DST active call for proposals. See the portal for full guidelines and eligibility.",
+    "category": "international",
+    "status": "Open",
+    "linkStatus": "verified",
+    "lastScraped": "2026-03-08T06:39:20.475Z",
+    "dataSource": "scraper:dst",
+    "targetAudience": [
+      "startup"
+    ],
+    "sectors": [
+      "DeepTech",
+      "Hardware",
+      "Agnostic"
+    ],
+    "stages": [
+      "Seed",
+      "Early Traction",
+      "Scale-up"
+    ]
+  },
+  {
+    "name": "DST DFG joint call on International Research Training Groups (IRTG)",
+    "body": "DST (MoST)",
+    "maxAward": "Varies",
     "deadline": "Rolling (Open All Year)",
-    "link": "https://indiainvestmentgrid.gov.in/opportunities/csr",
-    "description": "Official portal connecting Section 8 Incubators with corporate CSR mandates. Incubators can list projects to secure 2% CSR grants.",
-    "category": "csr",
+    "link": "https://onlinedst.gov.in/Projectproposalformat.aspx?Id=2232",
+    "description": "DST active call for proposals. See the portal for full guidelines and eligibility.",
+    "category": "international",
     "status": "Rolling",
-    "dataSource": "manual:csr",
     "linkStatus": "verified",
-    "lastScraped": "2026-03-08T06:40:03.574Z",
+    "lastScraped": "2026-03-08T06:39:21.984Z",
+    "dataSource": "scraper:dst",
     "targetAudience": [
-      "incubator",
       "startup"
     ],
     "sectors": [
+      "DeepTech",
+      "Hardware",
       "Agnostic"
     ],
     "stages": [
-      "All Stages"
-    ]
-  },
-  {
-    "name": "HDFC Bank Parivartan Start-up Grants (FY26)",
-    "body": "HDFC Bank CSR",
-    "maxAward": "₹20 Crores (Total Pool)",
-    "deadline": "Rolling (FY26 Cycle)",
-    "link": "https://www.hdfcbank.com/personal/useful-links/social-initiatives/parivartan",
-    "description": "CSR funding for social impact startups focusing on education, healthcare, and rural development.",
-    "status": "Verify Manually",
-    "linkStatus": "broken",
-    "category": "csr",
-    "lastScraped": "2026-03-08T06:41:42.017Z",
-    "dataSource": "research:notebooklm",
-    "targetAudience": [
-      "startup",
-      "incubator"
-    ],
-    "sectors": [
-      "Social Impact",
-      "HealthTech",
-      "EdTech"
-    ],
-    "stages": [
-      "Proof of Concept",
       "Seed",
+      "Early Traction",
       "Scale-up"
     ]
-  },
-  {
-    "name": "IIG - CSR Opportunities Portal",
-    "body": "Invest India",
-    "maxAward": "CSR Grants",
-    "deadline": "Rolling",
-    "link": "https://indiainvestmentgrid.gov.in/opportunities/csr",
-    "description": "Official portal connecting Section 8 Incubators with corporate CSR mandates.",
-    "targetAudience": [
-      "incubator",
-      "startup"
-    ],
-    "category": "csr",
-    "linkStatus": "verified",
-    "dataSource": "integrity-guard",
-    "lastScraped": "2026-03-08T07:22:12.803Z"
   }
 ]
