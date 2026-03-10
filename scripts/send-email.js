@@ -13,7 +13,14 @@ const DATA_FILE = path.join(process.cwd(), 'public', 'data', 'opportunities.json
 const HISTORY_FILE = path.join(process.cwd(), 'public', 'data', 'last_email_sent.json');
 
 async function sendEmail() {
-    const { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM, ABIF_TEAM_EMAIL, TARGET_EMAILS, GEMINI_API_KEY } = process.env;
+    const {
+        SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, SMTP_FROM,
+        ABIF_TEAM_EMAIL, TARGET_EMAILS, GEMINI_API_KEY,
+        DISPATCH_MODE, DISPATCH_FILTERS
+    } = process.env;
+
+    const mode = DISPATCH_MODE || 'standard';
+    const filters = DISPATCH_FILTERS ? JSON.parse(DISPATCH_FILTERS) : {};
 
     // Determine recipients
     let finalRecipients = TARGET_EMAILS && TARGET_EMAILS.trim() !== '' ? TARGET_EMAILS : ABIF_TEAM_EMAIL;
@@ -30,12 +37,31 @@ async function sendEmail() {
     }
 
     const currentData = JSON.parse(fs.readFileSync(DATA_FILE, 'utf8'));
-    const incubatorOpps = currentData.filter(x =>
-        x.targetAudience && x.targetAudience.includes('incubator') && x.status !== 'Closed'
-    );
 
-    if (incubatorOpps.length === 0) {
-        console.log('  ℹ No active incubator opportunities to email today.');
+    // --- DYNAMIC FILTERING LOGIC ---
+    let targetOpps = [];
+    if (mode === 'filtered') {
+        console.log(`  🔍 Applying custom filters: ${JSON.stringify(filters)}`);
+        targetOpps = currentData.filter(o => {
+            const matchesAudience = !filters.activeAudience || filters.activeAudience === 'all' || (o.targetAudience || []).includes(filters.activeAudience);
+            const matchesSector = !filters.activeSector || filters.activeSector === 'All Sectors' || (o.sectors || []).includes(filters.activeSector);
+            const matchesCategory = !filters.activeCategory || filters.activeCategory === 'all' || (o.category || '').toLowerCase() === filters.activeCategory.toLowerCase();
+            const matchesStatus = !filters.activeStatus || filters.activeStatus === 'all' || (filters.activeStatus === 'Open' ? ['Open', 'Closing Soon'].includes(o.status) : o.status === filters.activeStatus);
+            const matchesSearch = !filters.searchQuery ||
+                (o.name || '').toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
+                (o.description || '').toLowerCase().includes(filters.searchQuery.toLowerCase());
+
+            return matchesAudience && matchesSector && matchesCategory && matchesStatus && matchesSearch;
+        });
+    } else {
+        // Default Standard Mode: Incubator Focus
+        targetOpps = currentData.filter(x =>
+            x.targetAudience && x.targetAudience.includes('incubator') && x.status !== 'Closed'
+        );
+    }
+
+    if (targetOpps.length === 0) {
+        console.log(`  ℹ No matching opportunities found for mode: ${mode}. Skipping email.`);
         process.exit(0);
     }
 
@@ -49,12 +75,12 @@ async function sendEmail() {
         }
     }
 
-    const newItems = incubatorOpps.filter(curr => !historyOpps.some(hist => hist.name === curr.name));
+    const newItems = targetOpps.filter(curr => !historyOpps.some(hist => hist.name === curr.name));
     const closedItems = historyOpps.filter(hist => !currentData.some(curr => curr.name === hist.name && curr.status !== 'Closed'));
 
     console.log(`\n─── Delta Analysis: ${newItems.length} New, ${closedItems.length} Closed ───`);
 
-    console.log(`\n─── Preparing Email for ${incubatorOpps.length} Incubator Opportunities ───`);
+    console.log(`\n─── Preparing ${mode.toUpperCase()} Email for ${targetOpps.length} Opportunities ───`);
 
     const transporter = nodemailer.createTransport({
         host: SMTP_HOST,
@@ -68,7 +94,7 @@ async function sendEmail() {
 
     // --- AI GENERATION ---
     let aiIntro = `<p style="font-size: 16px; line-height: 1.6; color: #475569; margin-bottom: 24px;">Greetings! I am the <strong>AI Agent of Tarun Tej Thadana (TBI Manager, ABIF)</strong>. I have compiled the latest deep-scan across the Indian funding ecosystem for you. Here are the active mandates relevant for our incubator and portfolio initiatives:</p>`;
-    let aiSubject = `📡 [ABIF Intelligence] ${newItems.length > 0 ? `NEW: ${newItems[0].name.slice(0, 20)}... + ` : ''}${incubatorOpps.length} Mandates for Tarun Tej`;
+    let aiSubject = `📡 [ABIF Intelligence] ${newItems.length > 0 ? `NEW: ${newItems[0].name.slice(0, 20)}... + ` : ''}${targetOpps.length} Mandates for Tarun Tej`;
 
     if (GEMINI_API_KEY) {
         try {
@@ -76,12 +102,17 @@ async function sendEmail() {
             const genAI = new GoogleGenerativeAI(GEMINI_API_KEY);
             const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
+            const filterContext = mode === 'filtered'
+                ? `The user has applied specific filters: ${JSON.stringify(filters)}. Focus the briefing on this specific slice of the ecosystem.`
+                : "This is a standard broad scan for the ABIF Incubator ecosystem.";
+
             const prompt = `You are the personalized AI Agent of Tarun Tej Thadana, TBI Manager of ABIF IIT Kharagpur. 
             Greeting Requirements:
             1. Introduce yourself as Tarun's AI Agent.
-            2. Share some relevant latest catchy info or insight about the Indian AgriTech/Incubator ecosystem.
-            3. Summarize the changes: ${newItems.length} new opportunities found, ${closedItems.length} items recently closed/removed.
-            4. Current opportunities: ${JSON.stringify(incubatorOpps.map(o => o.name))}.
+            2. ${filterContext}
+            3. Share some relevant latest catchy info or insight about the Indian AgriTech/Incubator ecosystem.
+            4. Summarize the changes: ${newItems.length} new opportunities found, ${closedItems.length} items recently closed/removed.
+            5. Current opportunities: ${JSON.stringify(targetOpps.map(o => o.name))}.
             
             Format your response as a JSON object:
             {
@@ -151,7 +182,7 @@ async function sendEmail() {
                 <div style="height: 1px; background-color: #e2e8f0; margin: 30px 0;"></div>
     `;
 
-    incubatorOpps.forEach((opp, i) => {
+    targetOpps.forEach((opp, i) => {
         let statusColor = opp.status === 'Closing Soon' ? '#ef4444' : opp.status === 'Open' ? '#10b981' : '#3b82f6';
         let statusBg = opp.status === 'Closing Soon' ? '#fef2f2' : opp.status === 'Open' ? '#ecfdf5' : '#eff6ff';
 
@@ -214,13 +245,15 @@ async function sendEmail() {
             recipients: recipients,
             subject: aiSubject,
             aiIntro: aiIntro,
-            opportunityCount: incubatorOpps.length,
-            opportunities: incubatorOpps.map(o => o.name)
+            opportunityCount: targetOpps.length,
+            opportunities: targetOpps.map(o => o.name),
+            mode: mode,
+            filters: filters
         };
 
         const META_FILE = path.join(process.cwd(), 'public', 'data', 'last_dispatch_meta.json');
 
-        fs.writeFileSync(HISTORY_FILE, JSON.stringify(incubatorOpps, null, 2));
+        fs.writeFileSync(HISTORY_FILE, JSON.stringify(targetOpps, null, 2));
         fs.writeFileSync(META_FILE, JSON.stringify(dispatchMeta, null, 2));
 
         console.log('  ✓ History & Metadata updated for next dispatch.');

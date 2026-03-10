@@ -77,6 +77,7 @@ const App = () => {
     const [showReport, setShowReport] = useState(false);
     const [isEmailModalOpen, setIsEmailModalOpen] = useState(false);
     const [isSyncingReport, setIsSyncingReport] = useState(false);
+    const [briefingMode, setBriefingMode] = useState('standard');
     const [showFloatingBar, setShowFloatingBar] = useState(false);
 
     const sectionRefs = useRef({});
@@ -309,15 +310,43 @@ const App = () => {
                             <div className="flex justify-between items-center mb-1">
                                 <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest block ml-1">New Recipient(s)</label>
                                 <span className="text-[10px] font-black text-blue-500 bg-blue-500/10 px-2 py-0.5 rounded-full uppercase tracking-tighter">
-                                    {filtered.filter(o => o.targetAudience?.includes('incubator') && o.status !== 'Closed').length} Prospect Mandates
+                                    {briefingMode === 'standard'
+                                        ? filtered.filter(o => o.targetAudience?.includes('incubator') && o.status !== 'Closed').length
+                                        : filtered.length} Prospect Mandates
                                 </span>
+                            </div>
+
+                            {/* Briefing Mode Toggle */}
+                            <div className="flex gap-2 mb-4 p-1 bg-slate-50 dark:bg-slate-800/80 rounded-2xl border border-slate-100 dark:border-white/5">
+                                <button
+                                    onClick={() => setBriefingMode('standard')}
+                                    className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${briefingMode === 'standard' ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}
+                                >
+                                    Standard (Incubator)
+                                </button>
+                                <button
+                                    onClick={() => setBriefingMode('filtered')}
+                                    className={`flex-1 py-3 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${briefingMode === 'filtered' ? 'bg-white dark:bg-slate-700 text-blue-600 shadow-sm' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-200'}`}
+                                    disabled={!isFiltered}
+                                >
+                                    Current Filters
+                                </button>
                             </div>
                             <div>
                                 <input
                                     type="text"
                                     placeholder="Enter emails separated by commas..."
                                     className="w-full text-sm font-bold bg-slate-50 dark:bg-slate-800 border-none rounded-2xl px-5 py-4 focus:ring-2 focus:ring-blue-500 outline-none text-slate-900 dark:text-white"
-                                    onKeyDown={(e) => { if (e.key === 'Enter' && e.target.value.trim()) { handleEmailTrigger(e.target.value); setIsEmailModalOpen(false); } }}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' && e.target.value.trim()) {
+                                            handleEmailTrigger(
+                                                e.target.value,
+                                                briefingMode,
+                                                briefingMode === 'filtered' ? { activeAudience, activeCategory, activeSector, activeStatus, searchQuery } : {}
+                                            );
+                                            setIsEmailModalOpen(false);
+                                        }
+                                    }}
                                 />
                             </div>
                             <p className="text-[9px] text-slate-400 font-bold uppercase italic px-1">
@@ -327,7 +356,11 @@ const App = () => {
                                 onClick={() => {
                                     const input = document.querySelector('input[placeholder="Enter emails separated by commas..."]');
                                     if (input && input.value.trim()) {
-                                        handleEmailTrigger(input.value);
+                                        handleEmailTrigger(
+                                            input.value,
+                                            briefingMode,
+                                            briefingMode === 'filtered' ? { activeAudience, activeCategory, activeSector, activeStatus, searchQuery } : {}
+                                        );
                                         setIsEmailModalOpen(false);
                                     }
                                 }}

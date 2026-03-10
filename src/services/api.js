@@ -62,15 +62,15 @@ export const getScraperStatus = async () => {
 /**
  * Trigger & Status for Email Intelligence Dispatch
  */
-export const triggerEmail = async (target_emails) => {
-    console.log('📡 [API] Attempting to trigger email dispatch via Vercel Proxy...');
+export const triggerEmail = async (target_emails, mode = 'standard', filters = {}) => {
+    console.log(`📡 [API] Attempting to trigger email dispatch (${mode}) via Vercel Proxy...`);
     console.log(`🔗 Target URL: ${API_BASE_URL}/api/trigger-email`);
 
     try {
         const res = await fetch(`${API_BASE_URL}/api/trigger-email`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ target_emails })
+            body: JSON.stringify({ target_emails, mode, filters })
         });
 
         const data = await res.json();

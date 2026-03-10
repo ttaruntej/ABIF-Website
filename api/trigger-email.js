@@ -28,7 +28,7 @@ export default async function handler(req, res) {
     };
 
     if (req.method === 'POST') {
-        let { target_emails } = req.body || {};
+        let { target_emails, mode, filters } = req.body || {};
 
         // Basic Sanitization: Extract valid emails only
         if (target_emails) {
@@ -51,7 +51,9 @@ export default async function handler(req, res) {
                     body: JSON.stringify({
                         ref: 'main',
                         inputs: {
-                            target_emails: target_emails
+                            target_emails: target_emails,
+                            mode: mode || 'standard',
+                            filters: JSON.stringify(filters || {})
                         }
                     }),
                 }

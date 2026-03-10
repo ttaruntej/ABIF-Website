@@ -32,7 +32,7 @@ export const useEmailDispatch = (addLog) => {
         return () => clearInterval(interval);
     }, []);
 
-    const handleEmailTrigger = async (targetEmails) => {
+    const handleEmailTrigger = async (target_emails, mode = 'standard', filters = {}) => {
         if (dispatching || emailCooldown > 0) return;
         try {
             setDispatching(true);
@@ -50,12 +50,12 @@ export const useEmailDispatch = (addLog) => {
             }, 1000);
 
             setEmailNotification({ type: 'initializing', message: 'Connecting to Dispatch Proxy...' });
-            addLog(`Initiating dispatch relay to stakeholder`, 'info');
+            addLog(`Initiating ${mode} dispatch relay to stakeholder`, 'info');
 
             ReactGA.event({
                 category: "Communication",
                 action: "email_dispatch_triggered",
-                label: targetEmails
+                label: `${mode}:${target_emails}`
             });
 
             let baselineRunId;
@@ -64,7 +64,7 @@ export const useEmailDispatch = (addLog) => {
                 baselineRunId = initialStatus?.run_id;
             } catch (e) { }
 
-            await triggerEmail(targetEmails);
+            await triggerEmail(target_emails, mode, filters);
             setEmailNotification({ type: 'in_progress', message: 'Synthesizing Strategic Briefing...' });
 
             let attempts = 0;

@@ -7,6 +7,14 @@ on:
         description: 'Target email addresses (comma separated). Leave blank to use default.'
         required: false
         default: ''
+      mode:
+        description: 'Briefing mode (standard | filtered)'
+        required: false
+        default: 'standard'
+      filters:
+        description: 'JSON string of filters to apply'
+        required: false
+        default: '{}'
 
 permissions:
   contents: write
@@ -33,6 +41,8 @@ jobs:
         run: node scripts/send-email.js
         env:
           TARGET_EMAILS: ${{ github.event.inputs.target_emails }}
+          DISPATCH_MODE: ${{ github.event.inputs.mode }}
+          DISPATCH_FILTERS: ${{ github.event.inputs.filters }}
           SMTP_HOST: ${{ secrets.SMTP_HOST }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASS: ${{ secrets.SMTP_PASS }}
