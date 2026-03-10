@@ -92,14 +92,14 @@ const Footer = ({ lastUpdatedTs }) => {
                         </div>
                         <div className="space-y-5">
                             <div className="flex items-start gap-4">
-                                <img src="/logos/iitkgp-logo.png" alt="IITKGP" className="w-8 h-8 object-contain opacity-90" />
+                                <img src="logos/iitkgp-logo.png" alt="IITKGP" className="w-8 h-8 object-contain opacity-90" />
                                 <div className="flex flex-col">
                                     <a href="http://www.iitkgp.ac.in/" target="_blank" rel="noopener noreferrer" className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-tighter hover:text-blue-500 transition-colors">IIT Kharagpur</a>
                                     <span className="text-[9px] text-slate-500 dark:text-slate-500 uppercase font-bold mt-0.5">AgFE Department Host</span>
                                 </div>
                             </div>
                             <div className="flex items-start gap-4">
-                                <img src="/logos/nabard-logo.png" alt="NABARD" className="w-8 h-8 object-contain" />
+                                <img src="logos/nabard-logo.png" alt="NABARD" className="w-8 h-8 object-contain" />
                                 <div className="flex flex-col">
                                     <a href="https://www.nabard.org/" target="_blank" rel="noopener noreferrer" className="text-[11px] font-black text-slate-900 dark:text-white uppercase tracking-tighter hover:text-emerald-500 transition-colors">NABARD</a>
                                     <span className="text-[9px] text-slate-500 dark:text-slate-500 uppercase font-bold mt-0.5">Strategic Funding Partner</span>
